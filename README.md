@@ -13,6 +13,3 @@ The purpose of this exercise is to learn basics of Docker Compose through hands 
 - Open a new terminal and run "curl localhost:8001"
 - Switch back to previous terminal and view the results.
 - To stop: CTRL+C (because terminal is attached by default) and "docker-compose down"
-
-## Notes:
-- The exercise instructions are lacking. You need to change directory to the cloned folder after git clone.
