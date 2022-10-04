@@ -1,0 +1,13 @@
+services:
+  service1:
+    build: ./service1
+    image: service1
+    environment:
+      - SERVICE2_ADDRESS=http://service2:8002
+    ports:
+      - "8001:8001"
+  service2:
+    build: ./service2
+    image: service2
+    ports:
+      - "8002"
