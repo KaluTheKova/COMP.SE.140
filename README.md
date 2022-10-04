@@ -6,6 +6,13 @@ For managing and orchestrating cloud system, Docker Compose is a key technology.
 For more info see https://docs.docker.com/compose/
 The purpose of this exercise is to learn basics of Docker Compose through hands on.
 
+## How to run:
+- "git clone https://github.com/KaluTheKova/COMP.SE.140.git"
+- "cd COMP.SE.140"
+- "docker-compose up --build"
+- Open a new terminal and run "curl localhost:8001"
+- Switch back to previous terminal and view the results.
+- To stop: CTRL+C (because terminal is attached by default) and "docker-compose down"
+
 ## Notes:
-- The exercise instructions are lacking. Note you need to change directory after git clone.
-- So if you are running "git clone -b compose <the git url you gave>", run "cd <the cloned folder>".
+- The exercise instructions are lacking. You need to change directory to the cloned folder after git clone.
