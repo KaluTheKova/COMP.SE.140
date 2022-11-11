@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -11,6 +12,7 @@ import (
 // GLOBALS
 var allTopics string = "compse.*"
 var rabbitMQAddress string = "amqp://guest:guest@rabbitmq:5672/"
+var filename string = "/app/messages.txt"
 
 // Subscribes to all messages within the network, therefore receiving from both compse140.o and compse140.i
 // Stores the messages into a file
@@ -81,9 +83,13 @@ func consumeMessagesFromQueue() {
 
 	var forever chan struct{}
 
+	counter := 0
+
 	go func() {
 		for d := range msgs {
 			log.Printf("Received a message: %s from queue %v", d.Body, queue.Name)
+			counter++
+			buildTimeStampedMessage(string(d.Body), counter)
 		}
 	}()
 
@@ -93,13 +99,15 @@ func consumeMessagesFromQueue() {
 
 // Write listened messages to file
 func writeToFile() {
+	//file, err := os.OpenFile(name, os.O_RDONLY|os.O_CREATE, 0666)
 	// 1. Create file if not exist
 	// 2. Store file in container (separate mount/volume?)
 	// 3. Append each received message to file
 
 }
 
-func buildTimeStampedMessage(message string) string {
+// Builds a message with timestamp and message counter
+func buildTimeStampedMessage(message string, counter int) string {
 	timestamp := time.Now().Format("2006-01-02T15:04:05.999Z")
 	timeStampedMessage := fmt.Sprintf("%v", timestamp)
 	return timeStampedMessage
@@ -109,5 +117,13 @@ func buildTimeStampedMessage(message string) string {
 func failOnError(err error, msg string) {
 	if err != nil {
 		log.Panicf("%s: %s", msg, err)
+	}
+}
+
+// Removes filename
+func clearFileOnStartup(filename string) {
+	err := os.Remove(filename)
+	if err != nil {
+		log.Println(err)
 	}
 }

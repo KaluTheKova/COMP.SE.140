@@ -1,0 +1,3 @@
+1. Docker volume johon file kirjoitetaan.
+2. File pitää poistaa/puhdistaa startupissa. TEE SE OBSEN STARTUPISSA
+3. HTTP serv
