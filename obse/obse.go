@@ -24,65 +24,7 @@ func main() {
 
 	// TO DO: TOPIC compse140.o and TOPIC compse140.i
 	consumeMessagesFromQueue2("compse140.i") // Ongelma siis täällä. Obse ei pääse kuuntelemaan topicia "compse140.i"
-	consumeMessagesFromQueue1("compse140.o") // Jälkimmäinen consumer ei ikinä käynnisty
-}
-
-func consumeMessagesFromQueue1(queueName string) {
-	log.Println("DEBUG: STARTING TOPIC2 CONSUMER")
-	// initialize connection
-	conn, err := amqp.Dial(rabbitMQAddress)
-	failOnError(err, "Failed to connect to RabbitMQ")
-	defer conn.Close()
-
-	// Separate channels for consume and publish
-	// open channel
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
-
-	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
-	queue, err := ch.QueueDeclare(
-		queueName, // name
-		true,      // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
-	)
-	failOnError(err, "Failed to declare a queue")
-
-	// Prefetch
-	err = ch.Qos(
-		1,     // prefetch count
-		0,     // prefetch size
-		false, // global
-	)
-	failOnError(err, "Failed to set QoS")
-
-	// Consume messages
-	msgs, err := ch.Consume(
-		queue.Name, // queue
-		"",         // consumer
-		false,      // auto-ack OFF, send MANUAL ack in worker
-		false,      // exclusive
-		false,      // no-local
-		false,      // no-wait
-		nil,        // args
-	)
-	failOnError(err, "Failed to register a consumer")
-
-	var forever chan struct{}
-
-	go func() {
-		for d := range msgs {
-			//time.Sleep(1 * time.Second) // Wait for 1 second
-			log.Printf("Received a message: %s from topic %v", d.Body, queue.Name)
-			d.Ack(false) // ACKNOWLEDGE
-		}
-	}()
-
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
-	<-forever
+	//consumeMessagesFromQueue1("compse140.o") // Jälkimmäinen consumer ei ikinä käynnisty
 }
 
 func consumeMessagesFromQueue2(queueName string) {
@@ -99,6 +41,18 @@ func consumeMessagesFromQueue2(queueName string) {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
+	// Exchange
+	err = ch.ExchangeDeclare(
+		"logs",   // name
+		"fanout", // type TOPIC?
+		true,     // durable
+		false,    // auto-deleted
+		false,    // internal
+		false,    // no-wait
+		nil,      // arguments
+	)
+	failOnError(err, "Failed to declare an exchange")
+
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
 		queueName, // name
@@ -109,6 +63,16 @@ func consumeMessagesFromQueue2(queueName string) {
 		nil,       // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
+
+	// Bind
+	err = ch.QueueBind(
+		queue.Name, // queue name
+		topicO,     // routing key
+		"logs",     // exchange
+		false,
+		nil,
+	)
+	failOnError(err, "Failed to bind a queue")
 
 	// Prefetch
 	err = ch.Qos(

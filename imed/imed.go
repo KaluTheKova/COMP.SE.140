@@ -42,6 +42,18 @@ func consumeMessagesFromQueue() {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
+	// Exchange
+	err = ch.ExchangeDeclare(
+		"logs",   // name
+		"fanout", // type TOPIC?
+		true,     // durable
+		false,    // auto-deleted
+		false,    // internal
+		false,    // no-wait
+		nil,      // arguments
+	)
+	failOnError(err, "Failed to declare an exchange")
+
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
 		consumedQueue, // name
@@ -52,6 +64,16 @@ func consumeMessagesFromQueue() {
 		nil,           // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
+
+	// Bind
+	err = ch.QueueBind(
+		queue.Name,    // queue name
+		consumedQueue, // routing key
+		"logs",        // exchange
+		false,
+		nil,
+	)
+	failOnError(err, "Failed to bind a queue")
 
 	// Prefetch
 	err = ch.Qos(
@@ -102,16 +124,17 @@ func sendMessageToQueue(message string) {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	// declare queue
-	queue, err := ch.QueueDeclare(
-		sendingQueue, // name
-		true,         // durable
-		false,        // delete when unused
-		false,        // exclusive
-		false,        // no-wait
-		nil,          // arguments
+	// Exchange
+	err = ch.ExchangeDeclare(
+		"logs",   // name
+		"fanout", // type TOPIC?
+		true,     // durable
+		false,    // auto-deleted
+		false,    // internal
+		false,    // no-wait
+		nil,      // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	failOnError(err, "Failed to declare an exchange")
 
 	// cancel when ended
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -120,10 +143,10 @@ func sendMessageToQueue(message string) {
 	// message body
 	body := message
 	err = ch.PublishWithContext(ctx,
-		"",         // exchange
-		queue.Name, // routing key
-		false,      // mandatory
-		false,      // immediate
+		"logs",       // exchange
+		sendingQueue, // routing key
+		false,        // mandatory
+		false,        // immediate
 		amqp.Publishing{
 			DeliveryMode: amqp.Persistent,
 			ContentType:  "text/plain",
@@ -131,7 +154,7 @@ func sendMessageToQueue(message string) {
 		})
 	failOnError(err, "Failed to publish a message")
 	//log.Printf(" [x] Sent %s\n", body)
-	log.Printf(" [x] Sent %s to topic %v\n", body, queue.Name) // DEBUG
+	log.Printf(" [x] Sent %s to topic %v\n", body, sendingQueue) // DEBUG
 }
 
 // Helper to check each ampq call
