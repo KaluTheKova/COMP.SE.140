@@ -10,4 +10,3 @@ Asynchronous communication allows scaling of workers to answer the needs of a in
 
 # Main learnings
 This was a good exercise. The best thing about this was that I got to refresh my memory on many parts of programming messaging systems and container communication. I had totally forgotten about healthchecking and dependency starting a cluster, since things like that have already been solved at work.
-I left debugging messages in, since according to the instructions we'll be using this later. However, those messages shouldn't be visible to you if you check the system according to instructions.
