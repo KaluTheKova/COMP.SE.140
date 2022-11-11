@@ -1,0 +1,19 @@
+services:
+  orig:
+    build: ./orig
+    #image: orig
+  imed:
+    build: ./imed
+    #image: imed
+    ports:
+      - "8080:80"
+  obse:
+    build: ./obse
+    #image: obse
+  rabbitmq:
+    build: ./rabbitmq
+    ports:
+    - 5672:5672
+    - 15672:15672
+    # docker run -it --rm --name rabbitmq -p  -p  rabbitmq:3.11-management
+  
