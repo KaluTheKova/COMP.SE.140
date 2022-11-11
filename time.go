@@ -10,14 +10,38 @@ import (
 
 func main() {
 
+	readFile()
+
 	//clearFileOnStartup("messages.txt")
 
-	listAllFilesInDirectory("/")
+	//listAllFilesInDirectory("/")
 
 	//message := buildTimeStampedMessage("MSG_1", 1, "compse140.i")
 
 	//writeToFile("messages.txt", message)
 
+}
+
+// readFile reads file written by OBSE
+func readFile() string {
+	// 1. When receiving HTTP GET <host>:8080
+	// 2. Open file (or current copy of it. Possibly mounted/shared folder with OBSE?)
+	// 3. Read contents of file.
+	// 4. Return contents of file.
+	/* 	file, err := os.Open("messages.txt")
+	   	if err != nil {
+	   		log.Println(err)
+	   	}
+	   	defer file.Close() */
+
+	file, err := os.ReadFile("messages.txt")
+	if err != nil {
+		log.Println(err)
+	}
+	fileContents := string(file)
+	fmt.Println(fileContents)
+
+	return fileContents
 }
 
 // Write listened messages to file

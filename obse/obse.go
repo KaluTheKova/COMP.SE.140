@@ -24,8 +24,6 @@ func main() {
 
 	clearFileOnStartup("messages.txt")
 
-	listAllFilesInDirectory(path)
-
 	consumeMessagesFromQueue()
 }
 

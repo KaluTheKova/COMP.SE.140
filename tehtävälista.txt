@@ -1,5 +1,5 @@
 - Docker volume johon file kirjoitetaan. DONE
 - File pitää poistaa/puhdistaa startupissa. TEE SE OBSEN STARTUPISSA DONE
+- HTTP serv
 - Healthcheck, jotta rabbitmq on käynnistynyt ennen viestien lähettämistä.
 - Healthcheck, jotta consumerit on käynnistynyt ennen viestien lähettämistä.
-- HTTP serv
