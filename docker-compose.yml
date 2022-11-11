@@ -5,11 +5,10 @@ services:
     build: ./orig
     #command: ["app/wait-for-it.sh", "rabbitmq:15672", -- echo "rabbitmq is up", "/app/orig"]
     depends_on:
-      # rabbitmq:
-      #   condition: service_healthy
       - rabbitmq
       - imed
       - obse
+      - httpserv
     links: 
         - rabbitmq
   

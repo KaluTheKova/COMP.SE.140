@@ -9,6 +9,5 @@ Docker Compose version v2.12.1
 Asynchronous communication allows scaling of workers to answer the needs of a increasing message load. Using topics allows us distribute our messages and read them however we want. And the with the consumer acknowledgement, we can make sure that even if a consumer crashes, we can spool up a new consumer and our message can be recovered.
 
 # Main learnings
-This was a good exercise. The best thing about this was that I got to refresh my memory on many parts of programming messaging systems and container communication. Otherwise this is pretty much what I do at work, so I can't say I learned anything new. Shame I had to do this in a rush.
-
-docker-compose build --no-cache && docker-compose up -d --force-recreate
+This was a good exercise. The best thing about this was that I got to refresh my memory on many parts of programming messaging systems and container communication. I had totally forgotten about healthchecking and dependency starting a cluster, since things like that have already been solved at work.
+I left debugging messages in, since according to the instructions we'll be using this later. However, those messages shouldn't be visible to you if you check the system according to instructions.
