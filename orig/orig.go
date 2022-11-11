@@ -17,8 +17,7 @@ var sendingQueue = "compse140.o"
 // TOPIC compse140.o in RabbitMQ
 func main() {
 
-	log.Printf("Original starting. Sleeping 20 secs.")
-	time.Sleep(25 * time.Second)
+	log.Printf("Original starting.") // DEBUG
 
 	conn := initializeConnection(rabbitMQAddress)
 	defer conn.Close()
@@ -72,7 +71,7 @@ func sendMessageToRabbit(message string, conn *amqp.Connection) {
 			Body:        []byte(body),
 		})
 	failOnError(err, "Failed to publish a message")
-	log.Printf(" [x] Sent %s\n", body)
+	log.Printf(" [x] Sent %s\n", body) // DEBUG
 }
 
 func initializeConnection(rabbitMQAddress string) *amqp.Connection {

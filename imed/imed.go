@@ -17,8 +17,7 @@ var rabbitMQAddress string = "amqp://guest:guest@rabbitmq:5672/"
 // Subscribes for messages from compse140.o
 // Publishes message to compse140.i
 func main() {
-	log.Printf("IMED starting. Sleeping 20 secs.")
-	time.Sleep(20 * time.Second)
+	log.Printf("IMED starting.") // DEBUG
 
 	consumeMessagesFromQueue()
 }
@@ -86,8 +85,8 @@ func consumeMessagesFromQueue() {
 
 	go func() {
 		for d := range msgs {
-			time.Sleep(1 * time.Second) // Wait for 1 second
-			log.Printf("Received a message: %s from queue %v", d.Body, queue.Name)
+			time.Sleep(1 * time.Second)                                            // Wait for 1 second
+			log.Printf("Received a message: %s from queue %v", d.Body, queue.Name) // DEBUG
 			message := fmt.Sprintf("Got %v", string(d.Body))
 			sendMessageToQueue(message)
 		}

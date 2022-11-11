@@ -10,3 +10,5 @@ Asynchronous communication allows scaling of workers to answer the needs of a in
 
 # Main learnings
 This was a good exercise. The best thing about this was that I got to refresh my memory on many parts of programming messaging systems and container communication. Otherwise this is pretty much what I do at work, so I can't say I learned anything new. Shame I had to do this in a rush.
+
+docker-compose build --no-cache && docker-compose up -d --force-recreate

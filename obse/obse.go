@@ -19,8 +19,7 @@ var path string = "/app"
 // Subscribes to all messages within the network, therefore receiving from both compse140.o and compse140.i
 // Stores the messages into a file
 func main() {
-	log.Printf("Observer starting. Sleeping 20 secs.")
-	time.Sleep(20 * time.Second)
+	log.Printf("Observer starting.") // DEBUG
 
 	clearFileOnStartup("messages.txt")
 
@@ -83,7 +82,7 @@ func consumeMessagesFromQueue() {
 	)
 	failOnError(err, "Failed to register a consumer")
 
-	log.Printf("Listening to queue %s\n", queue.Name)
+	log.Printf("Listening to queue %s\n", queue.Name) // DEBUG
 
 	var forever chan struct{}
 
@@ -91,7 +90,7 @@ func consumeMessagesFromQueue() {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message: %s from queue %v", d.Body, queue.Name)
+			log.Printf("Received a message: %s from queue %v", d.Body, queue.Name) // DEBUG
 			counter++
 			timeStampedMessage := buildTimeStampedMessage(string(d.Body), counter, d.RoutingKey)
 			err := writeToFile(filename, timeStampedMessage)
@@ -140,7 +139,7 @@ func clearFileOnStartup(filename string) {
 		log.Println(err)
 	}
 
-	log.Printf("REMOVED FILENAME %v", filename)
+	log.Printf("Removed file: %v", filename) // DEBUG
 }
 
 // Helper to check each ampq call

@@ -1,26 +1,61 @@
+version: '2.1'
+
 services:
   orig:
     build: ./orig
-    #image: orig
+    #command: ["app/wait-for-it.sh", "rabbitmq:15672", -- echo "rabbitmq is up", "/app/orig"]
+    depends_on:
+      # rabbitmq:
+      #   condition: service_healthy
+      - rabbitmq
+      - imed
+      - obse
+    links: 
+        - rabbitmq
+  
   imed:
     build: ./imed
-    #image: imed
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    links: 
+        - rabbitmq
+
   obse:
     build: ./obse
     volumes: 
       - message-storage:/app
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    links: 
+        - rabbitmq
+
   httpserv:
     build: ./httpserv
     volumes:
       - message-storage:/app
     ports:
       - "8080:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    links: 
+        - rabbitmq
+  
   rabbitmq:
     build: ./rabbitmq
     ports:
     - 5672:5672
     - 15672:15672
-    # docker run -it --rm --name rabbitmq -p  -p  rabbitmq:3.11-management
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  
   
 volumes:
   message-storage:
+
+# https://devops.stackexchange.com/questions/12092/docker-compose-healthcheck-for-rabbitmq/12200#12200
