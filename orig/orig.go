@@ -19,7 +19,7 @@ var sendingQueue = "compse140.o"
 func main() {
 
 	log.Printf("Original starting. Sleeping 20 secs.")
-	time.Sleep(20 * time.Second)
+	time.Sleep(25 * time.Second)
 
 	conn := initializeConnection(rabbitMQAddress)
 	defer conn.Close()

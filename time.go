@@ -4,22 +4,24 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 )
 
 func main() {
 
-	clearFileOnStartup("messages.txt")
+	//clearFileOnStartup("messages.txt")
 
-	message := buildTimeStampedMessage("MSG_1", 1, "compse140.i")
+	listAllFilesInDirectory("/")
 
-	writeToFile("messages.txt", message)
+	//message := buildTimeStampedMessage("MSG_1", 1, "compse140.i")
+
+	//writeToFile("messages.txt", message)
 
 }
 
 // Write listened messages to file
 func writeToFile(filename string, message string) error {
-
 	file, err := os.OpenFile("messages.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return err
@@ -49,5 +51,19 @@ func clearFileOnStartup(filename string) {
 	err := os.Remove(filename)
 	if err != nil {
 		log.Println(err)
+	}
+}
+
+func listAllFilesInDirectory(path string) {
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		fmt.Printf("dir: %v: name: %s\n", info.IsDir(), path)
+		return nil
+	})
+	if err != nil {
+		fmt.Println(err)
 	}
 }

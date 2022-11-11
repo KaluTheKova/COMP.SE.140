@@ -1,22 +1,40 @@
 services:
   orig:
     build: ./orig
-    #image: orig
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
   imed:
     build: ./imed
-    #image: imed
     ports:
       - "8080:80"
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
   obse:
     build: ./obse
-    volumes: 
-      - messageStorage:/.
+    volumes:
+      - message-storage:/app
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
   rabbitmq:
     build: ./rabbitmq
     ports:
     - 5672:5672
     - 15672:15672
     # docker run -it --rm --name rabbitmq -p  -p  rabbitmq:3.11-management
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   
 volumes:
-  messageStorage:
+  message-storage:

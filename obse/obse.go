@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -12,13 +13,18 @@ import (
 // GLOBALS
 var allTopics string = "compse.*"
 var rabbitMQAddress string = "amqp://guest:guest@rabbitmq:5672/"
-var filename string = "/app/messages.txt"
+var filename string = "messages.txt"
+var path string = "/app"
 
 // Subscribes to all messages within the network, therefore receiving from both compse140.o and compse140.i
 // Stores the messages into a file
 func main() {
 	log.Printf("Observer starting. Sleeping 20 secs.")
 	time.Sleep(20 * time.Second)
+
+	clearFileOnStartup("messages.txt")
+
+	listAllFilesInDirectory(path)
 
 	consumeMessagesFromQueue()
 }
@@ -89,7 +95,11 @@ func consumeMessagesFromQueue() {
 		for d := range msgs {
 			log.Printf("Received a message: %s from queue %v", d.Body, queue.Name)
 			counter++
-			buildTimeStampedMessage(string(d.Body), counter)
+			timeStampedMessage := buildTimeStampedMessage(string(d.Body), counter, d.RoutingKey)
+			err := writeToFile(filename, timeStampedMessage)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}()
 
@@ -98,19 +108,41 @@ func consumeMessagesFromQueue() {
 }
 
 // Write listened messages to file
-func writeToFile() {
-	//file, err := os.OpenFile(name, os.O_RDONLY|os.O_CREATE, 0666)
-	// 1. Create file if not exist
-	// 2. Store file in container (separate mount/volume?)
-	// 3. Append each received message to file
+func writeToFile(filename string, message string) error {
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 
+	_, err = file.WriteString(message + "\n")
+	if err != nil {
+		return err
+	}
+
+	// Flush writer
+	file.Sync()
+
+	log.Printf("WROTE TO FILENAME %v MESSAGE %v\n", filename, message) // DEBUG
+
+	return nil
 }
 
 // Builds a message with timestamp and message counter
-func buildTimeStampedMessage(message string, counter int) string {
+func buildTimeStampedMessage(message string, counter int, topic string) string {
 	timestamp := time.Now().Format("2006-01-02T15:04:05.999Z")
-	timeStampedMessage := fmt.Sprintf("%v", timestamp)
+	timeStampedMessage := fmt.Sprintf("%v %v %v to %v", timestamp, counter, message, topic)
 	return timeStampedMessage
+}
+
+// Removes filename
+func clearFileOnStartup(filename string) {
+	err := os.Remove(filename)
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Printf("REMOVED FILENAME %v", filename)
 }
 
 // Helper to check each ampq call
@@ -120,10 +152,16 @@ func failOnError(err error, msg string) {
 	}
 }
 
-// Removes filename
-func clearFileOnStartup(filename string) {
-	err := os.Remove(filename)
+func listAllFilesInDirectory(path string) {
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		fmt.Printf("dir: %v: name: %s\n", info.IsDir(), path)
+		return nil
+	})
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 	}
 }

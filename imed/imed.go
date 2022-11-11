@@ -138,7 +138,7 @@ func sendMessageToQueue(message string) {
 			Body:        []byte(body),
 		})
 	failOnError(err, "Failed to publish a message")
-	log.Printf(" [x] Sent %s to topic %v\n", body, queue.Name) // DEBUG
+	log.Printf(" [x] Sent %s to mainQueue %v\n", body, queue.Name) // DEBUG
 }
 
 // Helper to check each ampq call

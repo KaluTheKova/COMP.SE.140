@@ -7,8 +7,8 @@ COPY go.mod ./
 RUN go mod download
 
 #COPY *.go ./
-COPY . ./
+COPY . /app
 
-RUN go build -o /obse
+RUN go build -o /app/obse
 
-CMD [ "/obse" ]
+CMD [ "/app/obse" ]
