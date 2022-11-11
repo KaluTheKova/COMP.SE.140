@@ -20,12 +20,7 @@ func main() {
 	log.Printf("IMED starting. Sleeping 20 secs.")
 	time.Sleep(20 * time.Second)
 
-	//messageChannel := make(chan string)
-
-	// Must be asynch
 	consumeMessagesFromQueue()
-
-	//sendMessageToQueue(message)
 }
 
 // Consumes messages from compse140.o
@@ -44,50 +39,42 @@ func consumeMessagesFromQueue() {
 
 	// Exchange
 	err = ch.ExchangeDeclare(
-		"compse", // name
-		"topic",  // type TOPIC?
-		true,     // durable
-		false,    // auto-deleted
-		false,    // internal
-		false,    // no-wait
-		nil,      // arguments
+		"mainExchange", // name
+		"topic",        // type TOPIC?
+		true,           // durable
+		false,          // auto-deleted
+		false,          // internal
+		false,          // no-wait
+		nil,            // arguments
 	)
 	failOnError(err, "Failed to declare an exchange")
 
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
-		"",    // name
-		true,  // durable
-		false, // delete when unused
-		false, // exclusive
-		false, // no-wait
-		nil,   // arguments
+		"mainQueue", // name
+		false,       // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
 	// Bind
 	err = ch.QueueBind(
-		queue.Name,    // queue name
-		consumedQueue, // routing key
-		"logs",        // exchange
+		"mainQueue",    // queue name
+		consumedQueue,  // routing key
+		"mainExchange", // exchange
 		false,
 		nil,
 	)
 	failOnError(err, "Failed to bind a queue")
 
-	// Prefetch
-	err = ch.Qos(
-		1,     // prefetch count
-		0,     // prefetch size
-		false, // global
-	)
-	failOnError(err, "Failed to set QoS")
-
 	// Consume messages
 	msgs, err := ch.Consume(
 		queue.Name, // queue
 		"",         // consumer
-		true,       // auto-ack OFF, send MANUAL ack in worker
+		true,       // auto-ack
 		false,      // exclusive
 		false,      // no-local
 		false,      // no-wait
@@ -95,14 +82,15 @@ func consumeMessagesFromQueue() {
 	)
 	failOnError(err, "Failed to register a consumer")
 
+	log.Printf("Listening to queue %s\n", queue.Name)
+
 	var forever chan struct{}
 
 	go func() {
 		for d := range msgs {
 			time.Sleep(1 * time.Second) // Wait for 1 second
 			log.Printf("Received a message: %s from queue %v", d.Body, queue.Name)
-			message := fmt.Sprintf("Got %v", string(d.Body)) // Sprintf tai messageChannel jumittaa homman
-			//log.Printf("RESENDING MESSAGEEEEEE %v", message) // DEBUG
+			message := fmt.Sprintf("Got %v", string(d.Body))
 			sendMessageToQueue(message)
 		}
 	}()
@@ -123,17 +111,16 @@ func sendMessageToQueue(message string) {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	// Exchange
-	err = ch.ExchangeDeclare(
-		"compse", // name
-		"topic",  // type TOPIC?
-		true,     // durable
-		false,    // auto-deleted
-		false,    // internal
-		false,    // no-wait
-		nil,      // arguments
+	// declare queue
+	queue, err := ch.QueueDeclare(
+		"mainQueue", // name
+		false,       // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
 	)
-	failOnError(err, "Failed to declare an exchange")
+	failOnError(err, "Failed to declare a queue")
 
 	// cancel when ended
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -142,18 +129,16 @@ func sendMessageToQueue(message string) {
 	// message body
 	body := message
 	err = ch.PublishWithContext(ctx,
-		"logs",       // exchange
-		sendingQueue, // routing key / binding key
-		false,        // mandatory
-		false,        // immediate
+		"mainExchange", // exchange
+		sendingQueue,   // routing key
+		false,          // mandatory
+		false,          // immediate
 		amqp.Publishing{
-			DeliveryMode: amqp.Persistent,
-			ContentType:  "text/plain",
-			Body:         []byte(body),
+			ContentType: "text/plain",
+			Body:        []byte(body),
 		})
 	failOnError(err, "Failed to publish a message")
-	//log.Printf(" [x] Sent %s\n", body)
-	log.Printf(" [x] Sent %s to topic %v\n", body, sendingQueue) // DEBUG
+	log.Printf(" [x] Sent %s to topic %v\n", body, queue.Name) // DEBUG
 }
 
 // Helper to check each ampq call

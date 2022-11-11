@@ -29,7 +29,7 @@ func main() {
 	for i := 1; i < numOfMessages+1; i++ {
 		message := createMessages(i)
 		sendMessageToRabbit(message, conn)
-		time.Sleep(3 * time.Second)
+		time.Sleep(3 * time.Second) // wait 3 seconds
 	}
 }
 
@@ -47,13 +47,13 @@ func sendMessageToRabbit(message string, conn *amqp.Connection) {
 
 	// Exchange
 	err = ch.ExchangeDeclare(
-		"compse", // name
-		"topic",  // type TOPIC?
-		true,     // durable
-		false,    // auto-deleted
-		false,    // internal
-		false,    // no-wait
-		nil,      // arguments
+		"mainExchange", // name
+		"topic",        // type TOPIC?
+		true,           // durable
+		false,          // auto-deleted
+		false,          // internal
+		false,          // no-wait
+		nil,            // arguments
 	)
 	failOnError(err, "Failed to declare an exchange")
 
@@ -64,14 +64,13 @@ func sendMessageToRabbit(message string, conn *amqp.Connection) {
 	// message body
 	body := message
 	err = ch.PublishWithContext(ctx,
-		"compse",     // exchange
-		sendingQueue, // routing key / binding key
-		false,        // mandatory
-		false,        // immediate
+		"mainExchange", // exchange
+		sendingQueue,   // routing key
+		false,          // mandatory
+		false,          // immediate
 		amqp.Publishing{
-			DeliveryMode: amqp.Persistent,
-			ContentType:  "text/plain",
-			Body:         []byte(body),
+			ContentType: "text/plain",
+			Body:        []byte(body),
 		})
 	failOnError(err, "Failed to publish a message")
 	log.Printf(" [x] Sent %s\n", body)
