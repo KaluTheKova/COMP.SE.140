@@ -47,8 +47,8 @@ func sendMessageToRabbit(message string, conn *amqp.Connection) {
 
 	// Exchange
 	err = ch.ExchangeDeclare(
-		"logs",   // name
-		"fanout", // type TOPIC?
+		"compse", // name
+		"topic",  // type TOPIC?
 		true,     // durable
 		false,    // auto-deleted
 		false,    // internal
@@ -64,8 +64,8 @@ func sendMessageToRabbit(message string, conn *amqp.Connection) {
 	// message body
 	body := message
 	err = ch.PublishWithContext(ctx,
-		"logs",       // exchange
-		sendingQueue, // routing key
+		"compse",     // exchange
+		sendingQueue, // routing key / binding key
 		false,        // mandatory
 		false,        // immediate
 		amqp.Publishing{

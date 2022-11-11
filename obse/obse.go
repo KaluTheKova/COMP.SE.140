@@ -43,8 +43,8 @@ func consumeMessagesFromQueue2(queueName string) {
 
 	// Exchange
 	err = ch.ExchangeDeclare(
-		"logs",   // name
-		"fanout", // type TOPIC?
+		"compse", // name
+		"topic",  // type TOPIC?
 		true,     // durable
 		false,    // auto-deleted
 		false,    // internal
@@ -55,20 +55,20 @@ func consumeMessagesFromQueue2(queueName string) {
 
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
-		queueName, // name
-		true,      // durable
-		false,     // delete when unused
-		false,     // exclusive
-		false,     // no-wait
-		nil,       // arguments
+		"",    // name
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
 	// Bind
 	err = ch.QueueBind(
 		queue.Name, // queue name
-		topicO,     // routing key
-		"logs",     // exchange
+		"#",        // routing key / binding key
+		"compse",   // exchange
 		false,
 		nil,
 	)
@@ -86,7 +86,7 @@ func consumeMessagesFromQueue2(queueName string) {
 	msgs, err := ch.Consume(
 		queue.Name, // queue
 		"",         // consumer
-		false,      // auto-ack
+		true,       // auto-ack
 		false,      // exclusive
 		false,      // no-local
 		false,      // no-wait
@@ -102,7 +102,6 @@ func consumeMessagesFromQueue2(queueName string) {
 		for d := range msgs {
 			//time.Sleep(1 * time.Second) // Wait for 1 second
 			log.Printf("Received a message: %s from topic %v", d.Body, queue.Name)
-			d.Ack(false) // ACKNOWLEDGE
 		}
 	}()
 

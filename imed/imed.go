@@ -44,8 +44,8 @@ func consumeMessagesFromQueue() {
 
 	// Exchange
 	err = ch.ExchangeDeclare(
-		"logs",   // name
-		"fanout", // type TOPIC?
+		"compse", // name
+		"topic",  // type TOPIC?
 		true,     // durable
 		false,    // auto-deleted
 		false,    // internal
@@ -56,12 +56,12 @@ func consumeMessagesFromQueue() {
 
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
-		consumedQueue, // name
-		true,          // durable
-		false,         // delete when unused
-		false,         // exclusive
-		false,         // no-wait
-		nil,           // arguments
+		"",    // name
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
@@ -87,7 +87,7 @@ func consumeMessagesFromQueue() {
 	msgs, err := ch.Consume(
 		queue.Name, // queue
 		"",         // consumer
-		false,      // auto-ack OFF, send MANUAL ack in worker
+		true,       // auto-ack OFF, send MANUAL ack in worker
 		false,      // exclusive
 		false,      // no-local
 		false,      // no-wait
@@ -100,11 +100,10 @@ func consumeMessagesFromQueue() {
 	go func() {
 		for d := range msgs {
 			time.Sleep(1 * time.Second) // Wait for 1 second
-			log.Printf("Received a message: %s", d.Body)
+			log.Printf("Received a message: %s from queue %v", d.Body, queue.Name)
 			message := fmt.Sprintf("Got %v", string(d.Body)) // Sprintf tai messageChannel jumittaa homman
 			//log.Printf("RESENDING MESSAGEEEEEE %v", message) // DEBUG
 			sendMessageToQueue(message)
-			d.Ack(false)
 		}
 	}()
 
@@ -126,8 +125,8 @@ func sendMessageToQueue(message string) {
 
 	// Exchange
 	err = ch.ExchangeDeclare(
-		"logs",   // name
-		"fanout", // type TOPIC?
+		"compse", // name
+		"topic",  // type TOPIC?
 		true,     // durable
 		false,    // auto-deleted
 		false,    // internal
@@ -144,7 +143,7 @@ func sendMessageToQueue(message string) {
 	body := message
 	err = ch.PublishWithContext(ctx,
 		"logs",       // exchange
-		sendingQueue, // routing key
+		sendingQueue, // routing key / binding key
 		false,        // mandatory
 		false,        // immediate
 		amqp.Publishing{
