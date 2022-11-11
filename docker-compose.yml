@@ -5,12 +5,16 @@ services:
   imed:
     build: ./imed
     #image: imed
-    ports:
-      - "8080:80"
   obse:
     build: ./obse
     volumes: 
       - message-storage:/app
+  httpserv:
+    build: ./httpserv
+    volumes:
+      - message-storage:/app
+    ports:
+      - "8080:8080"
   rabbitmq:
     build: ./rabbitmq
     ports:

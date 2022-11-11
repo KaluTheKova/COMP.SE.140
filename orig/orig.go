@@ -10,7 +10,6 @@ import (
 )
 
 // GLOBALS
-// var rabbitMQAddress string = os.Getenv("rabbitMQAddress")
 var rabbitMQAddress string = "amqp://guest:guest@rabbitmq:5672/"
 var sendingQueue = "compse140.o"
 

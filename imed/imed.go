@@ -23,8 +23,6 @@ func main() {
 	consumeMessagesFromQueue()
 }
 
-// Consumes messages from compse140.o
-// and sends them to compse140.i
 func consumeMessagesFromQueue() {
 	// initialize connection
 	conn, err := amqp.Dial(rabbitMQAddress)

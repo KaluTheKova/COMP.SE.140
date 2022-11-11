@@ -6,11 +6,9 @@ WORKDIR /app
 COPY go.mod ./
 RUN go mod download
 
-COPY *.go ./
+#COPY *.go ./
+COPY . /app
 
-RUN go build -o /service1
+RUN go build -o /app/httpserv
 
-EXPOSE 8001
-ENV SERVICE2_ADDRESS = "service2://service2:8002"
-
-CMD [ "/service1" ]
+CMD [ "/app/httpserv" ]
