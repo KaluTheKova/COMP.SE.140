@@ -48,7 +48,7 @@ func sendMessageToRabbit(message string, sendingQueue string, conn *amqp.Connect
 	// declare queue
 	queue, err := ch.QueueDeclare(
 		sendingQueue, // name
-		false,        // durable
+		true,         // durable
 		false,        // delete when unused
 		false,        // exclusive
 		false,        // no-wait
@@ -68,8 +68,9 @@ func sendMessageToRabbit(message string, sendingQueue string, conn *amqp.Connect
 		false,      // mandatory
 		false,      // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(body),
+			DeliveryMode: amqp.Persistent,
+			ContentType:  "text/plain",
+			Body:         []byte(body),
 		})
 	failOnError(err, "Failed to publish a message")
 	log.Printf(" [x] Sent %s\n", body)

@@ -43,7 +43,7 @@ func consumeMessagesFromQueue1(queueName string) {
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
 		queueName, // name
-		false,     // durable
+		true,      // durable
 		false,     // delete when unused
 		false,     // exclusive
 		false,     // no-wait
@@ -51,11 +51,19 @@ func consumeMessagesFromQueue1(queueName string) {
 	)
 	failOnError(err, "Failed to declare a queue")
 
+	// Prefetch
+	err = ch.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
+	failOnError(err, "Failed to set QoS")
+
 	// Consume messages
 	msgs, err := ch.Consume(
 		queue.Name, // queue
 		"",         // consumer
-		true,       // auto-ack
+		false,      // auto-ack OFF, send MANUAL ack in worker
 		false,      // exclusive
 		false,      // no-local
 		false,      // no-wait
@@ -69,6 +77,7 @@ func consumeMessagesFromQueue1(queueName string) {
 		for d := range msgs {
 			//time.Sleep(1 * time.Second) // Wait for 1 second
 			log.Printf("Received a message: %s from topic %v", d.Body, queue.Name)
+			d.Ack(false) // ACKNOWLEDGE
 		}
 	}()
 
@@ -93,7 +102,7 @@ func consumeMessagesFromQueue2(queueName string) {
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
 		queueName, // name
-		false,     // durable
+		true,      // durable
 		false,     // delete when unused
 		false,     // exclusive
 		false,     // no-wait
@@ -101,11 +110,19 @@ func consumeMessagesFromQueue2(queueName string) {
 	)
 	failOnError(err, "Failed to declare a queue")
 
+	// Prefetch
+	err = ch.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
+	failOnError(err, "Failed to set QoS")
+
 	// Consume messages
 	msgs, err := ch.Consume(
 		queue.Name, // queue
 		"",         // consumer
-		true,       // auto-ack
+		false,      // auto-ack
 		false,      // exclusive
 		false,      // no-local
 		false,      // no-wait
@@ -121,6 +138,7 @@ func consumeMessagesFromQueue2(queueName string) {
 		for d := range msgs {
 			//time.Sleep(1 * time.Second) // Wait for 1 second
 			log.Printf("Received a message: %s from topic %v", d.Body, queue.Name)
+			d.Ack(false) // ACKNOWLEDGE
 		}
 	}()
 

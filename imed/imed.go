@@ -26,7 +26,6 @@ func main() {
 	consumeMessagesFromQueue()
 
 	//sendMessageToQueue(message)
-
 }
 
 // Consumes messages from compse140.o
@@ -46,7 +45,7 @@ func consumeMessagesFromQueue() {
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
 		consumedQueue, // name
-		false,         // durable
+		true,          // durable
 		false,         // delete when unused
 		false,         // exclusive
 		false,         // no-wait
@@ -54,11 +53,19 @@ func consumeMessagesFromQueue() {
 	)
 	failOnError(err, "Failed to declare a queue")
 
+	// Prefetch
+	err = ch.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
+	failOnError(err, "Failed to set QoS")
+
 	// Consume messages
 	msgs, err := ch.Consume(
 		queue.Name, // queue
 		"",         // consumer
-		true,       // auto-ack
+		false,      // auto-ack OFF, send MANUAL ack in worker
 		false,      // exclusive
 		false,      // no-local
 		false,      // no-wait
@@ -75,6 +82,7 @@ func consumeMessagesFromQueue() {
 			message := fmt.Sprintf("Got %v", string(d.Body)) // Sprintf tai messageChannel jumittaa homman
 			//log.Printf("RESENDING MESSAGEEEEEE %v", message) // DEBUG
 			sendMessageToQueue(message)
+			d.Ack(false)
 		}
 	}()
 
@@ -97,7 +105,7 @@ func sendMessageToQueue(message string) {
 	// declare queue
 	queue, err := ch.QueueDeclare(
 		sendingQueue, // name
-		false,        // durable
+		true,         // durable
 		false,        // delete when unused
 		false,        // exclusive
 		false,        // no-wait
@@ -117,8 +125,9 @@ func sendMessageToQueue(message string) {
 		false,      // mandatory
 		false,      // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(body),
+			DeliveryMode: amqp.Persistent,
+			ContentType:  "text/plain",
+			Body:         []byte(body),
 		})
 	failOnError(err, "Failed to publish a message")
 	//log.Printf(" [x] Sent %s\n", body)
