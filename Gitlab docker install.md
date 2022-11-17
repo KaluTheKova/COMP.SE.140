@@ -36,6 +36,8 @@ docker run -d --name gitlab-runner --restart always \
 https://www.czerniga.it/2021/11/14/how-to-install-gitlab-using-docker-compose/
 docker exec -it web-1 grep 'Password:' /etc/gitlab/initial_root_password
 
+var/opt/gitlab/gitlab-kas/
+
 ## Register the runner
 https://docs.gitlab.com/runner/register/
 
@@ -56,8 +58,11 @@ http://docker/
 http://host.docker.internal/
 http://host.docker.internal:8080/
 http://kuutlab.com
+
+RATKAISU: paina vaan "Enter" kun kysytään urlia. LOL.
 token: SasFrsDntzJHXpESQjEM
 
+sudo nano gitlab/gitlab-runner/config.toml
 --------------------------------------
 
 https://stackoverflow.com/questions/41559660/gitlab-ci-runner-not-able-to-expose-ports-of-nested-docker-containers
@@ -67,6 +72,7 @@ PANIC: Failed to register the runner.
 
 Onko pakko käyttää EE:tä vai voiko käyttää CE?
 Kokeile ohjeiden mukainen CE jos toimiskin.
+RATKAISU: CE toimi.
 
 Configure GitLab for your system by editing /etc/gitlab/gitlab.rb file
 And restart this container to reload settings.
@@ -85,3 +91,15 @@ If this container fails to start due to permission problems try to fix it by exe
 
   docker exec -it gitlab update-permissions
   docker restart gitlab
+  '
+
+## Onnistunut rekisteröinti
+Mitä tein:
+1. Käytin gitlab-ce
+2. gitlab-runner:alpine
+3. komennot:
+- docker exec -it gitlab-runner gitlab-runner register --url "http://gitlab-ce" --clone-url "http://gitlab-ce"
+- "Press enter for url"
+4. Runner pysyy rekisteröitynä ee-versiossakin :o
+
+docker exec -it gitlab-runner gitlab-runner register --url "http://gitlab-ee" --clone-url "http://gitlab-ee"
