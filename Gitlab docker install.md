@@ -108,6 +108,7 @@ docker exec -it gitlab-runner gitlab-runner register --url "http://gitlab-ee" --
 https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories?platform=linux#removing-a-remote-repository
 
 git remote add local-gitlab http://localhost/gitlab-instance-9d36923c/COMP.SE.140.git
+git remote set-url local-gitlab http://localhost/gitlab-instance-9d36923c/COMP.SE.140.git
 git remote -v
 
 git log
