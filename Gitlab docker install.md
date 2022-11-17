@@ -109,6 +109,25 @@ https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-
 
 git remote add local-gitlab http://localhost/gitlab-instance-9d36923c/COMP.SE.140.git
 git remote set-url local-gitlab http://localhost/gitlab-instance-9d36923c/COMP.SE.140.git
+git remote set-url local-gitlab http://localhost/gitlab-instance-9d36923c/COMP.SE.140.git
 git remote -v
 
 git log
+
+## Multiple remote origins at once
+Define a git remote which will point to multiple git remotes.
+Say, we call it “all”: 
+git remote add all REMOTE-URL-1.
+git remote add all https://github.com/KaluTheKova/COMP.SE.140.git
+
+Register 1st push URL: 
+git remote set-url --add --push all https://github.com/KaluTheKova/COMP.SE.140.git
+Register 2nd push URL: 
+git remote set-url --add --push all http://localhost/gitlab-instance-9d36923c/COMP.SE.140.git
+
+Push a branch to all the remotes with 
+git push all BRANCH – replace BRANCH with a real branch name.
+git push all project
+
+You cannot pull from multiple remotes, but you can fetch updates from multiple remotes with git fetch --all.
+
