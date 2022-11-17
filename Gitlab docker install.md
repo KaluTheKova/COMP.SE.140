@@ -103,3 +103,11 @@ Mitä tein:
 4. Runner pysyy rekisteröitynä ee-versiossakin :o
 
 docker exec -it gitlab-runner gitlab-runner register --url "http://gitlab-ee" --clone-url "http://gitlab-ee"
+
+## Add new remote origin
+https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories?platform=linux#removing-a-remote-repository
+
+git remote add local-gitlab http://localhost/gitlab-instance-9d36923c/COMP.SE.140.git
+git remote -v
+
+git log
