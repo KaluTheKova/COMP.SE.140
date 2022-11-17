@@ -127,7 +127,11 @@ git remote set-url --add --push all http://localhost/gitlab-instance-9d36923c/CO
 
 Push a branch to all the remotes with 
 git push all BRANCH – replace BRANCH with a real branch name.
+
+
+### Git push & pull all
 git push all project
+git pull all project
 
 You cannot pull from multiple remotes, but you can fetch updates from multiple remotes with git fetch --all.
 
