@@ -10,6 +10,7 @@ services:
         external_url 'http://localhost'
     ports:
       - '8080:80'
+      - '80:80'
       - '8443:443'
     volumes:
       - '$GITLAB_HOME/config:/etc/gitlab'
