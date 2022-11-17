@@ -135,3 +135,4 @@ git pull all project
 
 You cannot pull from multiple remotes, but you can fetch updates from multiple remotes with git fetch --all.
 
+lol
