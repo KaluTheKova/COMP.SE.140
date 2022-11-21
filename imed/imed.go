@@ -67,6 +67,14 @@ func consumeMessagesFromQueue() {
 	)
 	failOnError(err, "Failed to bind a queue")
 
+	// Prefect QoS
+	err = ch.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
+	failOnError(err, "Failed to set QoS")
+
 	// Consume messages
 	msgs, err := ch.Consume(
 		queue.Name, // queue
@@ -85,10 +93,10 @@ func consumeMessagesFromQueue() {
 
 	go func() {
 		for d := range msgs {
-			time.Sleep(1 * time.Second)                                            // Wait for 1 second
 			log.Printf("Received a message: %s from queue %v", d.Body, queue.Name) // DEBUG
 			message := fmt.Sprintf("Got %v", string(d.Body))
 			sendMessageToQueue(message)
+			time.Sleep(1 * time.Second) // Wait for 1 second
 		}
 	}()
 

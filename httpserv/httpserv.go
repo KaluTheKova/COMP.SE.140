@@ -10,9 +10,9 @@ var filename string = "messages.txt"
 
 // When requested, returns content of the file created by OBSE
 func main() {
-	log.Printf("httpserv starting")
+	log.Printf("HTTPSERV STARTING")
 	http.HandleFunc("/", handler)
-	http.ListenAndServe(":8081", nil)
+	http.ListenAndServe(":8080", nil)
 }
 
 // Responds to HTTP GET <host>:8080 with readFile

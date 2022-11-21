@@ -19,30 +19,29 @@ var sendingQueue = "compse140.o"
 // TO DO: Modify the ORIG service to send messages forever until pause paused or stopped.
 func main() {
 
-	log.Printf("Original starting.") // DEBUG
+	log.Printf("ORIG STARTIGN") // DEBUG
 
 	conn := initializeConnection(rabbitMQAddress)
 	defer conn.Close()
 
-	// Send messages forever
-	sendMessagesForever := true
-	i := 1
-	for sendMessagesForever == true {
+	/* 	// Send messages forever TO DO
+	   	sendMessagesForever := true
+	   	i := 1
+	   	for sendMessagesForever == true {
+	   		message := createMessages(i)
+	   		sendMessageToRabbit(message, conn)
+	   		time.Sleep(3 * time.Second) // wait 3 seconds
+	   		i++
+	   	} */
+
+	// Send 3 messages to rabbitMQ
+	numOfMessages := 10
+	for i := 1; i < numOfMessages+1; i++ {
 		message := createMessages(i)
 		sendMessageToRabbit(message, conn)
 		time.Sleep(3 * time.Second) // wait 3 seconds
-		i++
 	}
 
-	/*
-		// Send 3 messages to rabbitMQ
-			 	numOfMessages := 3
-				for i := 1; i < numOfMessages+1; i++ {
-					message := createMessages(i)
-					sendMessageToRabbit(message, conn)
-					time.Sleep(3 * time.Second) // wait 3 seconds
-				}
-	*/
 }
 
 // createMessages Creates and returns string "MSG_{%v}" where %v is the int given as parameter

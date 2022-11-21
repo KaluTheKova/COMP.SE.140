@@ -10,7 +10,7 @@ var filename string = "messages.txt"
 
 // When requested, returns content of the file created by OBSE
 func main() {
-	log.Printf("API Gateway starting")
+	log.Printf("API GATEWAY STARTING")
 	http.HandleFunc("/messages", getMessages)
 	//http.HandleFunc("/state", putState)
 	//http.HandleFunc("/state", getState)
@@ -23,7 +23,7 @@ func main() {
 // forwards the request to HTTPSERV and returns the result.
 func getMessages(writer http.ResponseWriter, req *http.Request) {
 
-	resp, err := http.Get("httpserv:8081/")
+	resp, err := http.Get("httpserv:8080/")
 	if err != nil {
 		log.Println(err)
 	}

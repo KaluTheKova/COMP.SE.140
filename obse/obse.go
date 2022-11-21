@@ -19,7 +19,7 @@ var path string = "/app"
 // Subscribes to all messages within the network, therefore receiving from both compse140.o and compse140.i
 // Stores the messages into a file
 func main() {
-	log.Printf("Observer starting.") // DEBUG
+	log.Printf("OBSE STARTING") // DEBUG
 
 	clearFileOnStartup("messages.txt")
 
@@ -63,12 +63,20 @@ func consumeMessagesFromQueue() {
 	// Bind
 	err = ch.QueueBind(
 		"mainQueue",    // queue name
-		"compse140.#",  // routing key
+		"compse140.o",  // routing key
 		"mainExchange", // exchange
 		false,
 		nil,
 	)
 	failOnError(err, "Failed to bind a queue")
+
+	// Prefect QoS
+	err = ch.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
+	failOnError(err, "Failed to set QoS")
 
 	// Consume messages
 	msgs, err := ch.Consume(
@@ -81,8 +89,6 @@ func consumeMessagesFromQueue() {
 		nil,        // args
 	)
 	failOnError(err, "Failed to register a consumer")
-
-	log.Printf("Listening to queue %s\n", queue.Name) // DEBUG
 
 	var forever chan struct{}
 

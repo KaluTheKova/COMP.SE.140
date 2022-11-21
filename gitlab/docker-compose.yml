@@ -9,7 +9,7 @@ services:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'http://localhost'
     ports:
-      - '8080:80'
+      - '8081:80'
       - '80:80'
       - '8443:443'
     volumes:

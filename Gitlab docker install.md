@@ -132,7 +132,7 @@ git push all BRANCH – replace BRANCH with a real branch name.
 ### Git push & pull all
 git push all project
 git pull all project
-git fetch all
+git fetch all project
 
 You cannot pull from multiple remotes, but you can fetch updates from multiple remotes with git fetch --all.
 
@@ -141,3 +141,6 @@ You cannot pull from multiple remotes, but you can fetch updates from multiple r
 - unit tests to gateway
 - start developing
 - korjaa pipeline jos prakaa.
+
+## CURL COMMANDS
+curl localhost:8080
