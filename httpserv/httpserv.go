@@ -12,7 +12,7 @@ var filename string = "messages.txt"
 func main() {
 	log.Printf("httpserv starting")
 	http.HandleFunc("/", handler)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8081", nil)
 }
 
 // Responds to HTTP GET <host>:8080 with readFile

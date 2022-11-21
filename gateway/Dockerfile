@@ -9,6 +9,6 @@ RUN go mod download
 #COPY *.go ./
 COPY . /app
 
-RUN go build -o /app/httpserv
+RUN go build -o /app/gateway
 
-CMD [ "/app/httpserv" ]
+CMD [ "/app/gateway" ]
