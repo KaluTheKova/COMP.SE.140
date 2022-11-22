@@ -12,7 +12,7 @@ image: golang:alpine
 stages:
   - test
   # - build
-  - deploy
+  # - deploy
 
 test:
   stage: test
@@ -22,28 +22,6 @@ test:
     #- go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
     #- go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
     #- go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
-  artifacts:
-      paths:
-        - coverage-report.html
-      expire_in: 1 days
-    coverage: "/\\(statements\\)\\s+\\d+.?\\d+%/"
-
-coverage-page:
-  stage: deploy
-  script:
-    - echo 'Cleaning old pages'
-    - rm -rf public
-    - ls -la
-    - mkdir -p public && cp coverage-report.html public/
-    - echo 'Public directory content after copying files'
-    - ls -la ./public
-  artifacts:
-    paths:
-      - public
-    expire_in: never
-  only:
-    - master
-    - develop
 
 
 # compile:
