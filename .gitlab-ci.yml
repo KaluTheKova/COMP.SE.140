@@ -11,8 +11,6 @@ image: golang:alpine
 
 stages:
   - test
-  # - build
-  # - deploy
 
 test:
   stage: test
@@ -24,17 +22,3 @@ test:
     # - go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
     # - go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
 
-
-# compile:
-#   stage: build
-#   script:
-#     - mkdir -p mybinaries
-#     - go build -o mybinaries ./...
-#   artifacts:
-#     paths:
-#       - mybinaries
-
-# deploy:
-#   stage: deploy
-#   script: echo "Define your deployment script!"
-#   environment: production
