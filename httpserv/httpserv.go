@@ -17,7 +17,7 @@ func main() {
 
 // Responds to HTTP GET <host>:8080 with readFile
 func handler(writer http.ResponseWriter, req *http.Request) {
-	fileContents := readFile()
+	fileContents := ReadFileFromVolume(filename)
 
 	writer.WriteHeader(http.StatusOK)
 	writer.Header().Set("Content-Type", "application/text")
@@ -25,8 +25,8 @@ func handler(writer http.ResponseWriter, req *http.Request) {
 	return
 }
 
-// readFile reads file written by OBSE
-func readFile() []byte {
+// ReadFileFromVolume reads file written by OBSE into docker volume
+func ReadFileFromVolume(filename string) []byte {
 	fileContents, err := os.ReadFile(filename)
 	if err != nil {
 		log.Println(err)

@@ -6,7 +6,10 @@ import (
 	"net/http"
 )
 
-var filename string = "messages.txt"
+const (
+	filename        string = "messages.txt"
+	httpservAddress string = "http://localhost:8080/"
+)
 
 // When requested, returns content of the file created by OBSE
 func main() {
@@ -22,25 +25,30 @@ func main() {
 // Returns all message registered with OBSE-service. Assumed implementation
 // forwards the request to HTTPSERV and returns the result.
 func getMessages(writer http.ResponseWriter, req *http.Request) {
+	respBody := GetMessagesAPICall(httpservAddress)
 
-	resp, err := http.Get("httpserv:8080/")
+	writer.WriteHeader(http.StatusOK)
+	writer.Header().Set("Content-Type", "application/text")
+	writer.Write([]byte(respBody))
+	return
+}
+
+// GetMessagesAPICall sends http.Get to given address and returns bytecontent
+func GetMessagesAPICall(url string) []byte {
+
+	log.Println("Received GET/messages") // DEBUG
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusOK {
-		respBody, err := io.ReadAll(resp.Body)
-		if err != nil {
-			log.Println(err)
-		}
-		writer.WriteHeader(http.StatusOK)
-		writer.Header().Set("Content-Type", "application/text")
-		writer.Write([]byte(respBody))
-		return
+	log.Println("Reading response") // DEBUG
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
 	}
-	return
-
+	return respBody
 }
 
 // PUT /state (payload “INIT”, “PAUSED”, “RUNNING”, “SHUTDOWN”)

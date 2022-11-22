@@ -137,9 +137,23 @@ git fetch all project
 You cannot pull from multiple remotes, but you can fetch updates from multiple remotes with git fetch --all.
 
 ## TO DO
+1. CI
 - unit tests to gateway
 - Pipeline prakaa: go: cannot find main module, but found .git/config in
 https://stackoverflow.com/questions/57182988/gitlab-ci-and-go-modules
+- deployment to somewhere
+2. Unit tests for Gateway
+- mock API responses from API Gateway
+- GET /messages response
+- PUT /state (payload “INIT”, “PAUSED”, “RUNNING”, “SHUTDOWN”)
+- GET /state
+- GET /run-log (as text/plain)
+3. Dev
+- Implement gateway API's
+- Joko client tai irtofunccarit. Melkein sama asia. Irtofunkkarit ihan yhtä ok testata.
+- Modify the ORIG service to send messages forever until pause paused or stopped.
 
 ## CURL COMMANDS
 curl localhost:8080
+curl localhost:8083/messages
+curl -v -X GET localhost:8083/messages
