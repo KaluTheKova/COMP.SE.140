@@ -17,9 +17,12 @@ stages:
 test:
   stage: test
   script:
-    - go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
-    - go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
-    - go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+    - cd ./gateway
+    - go get -d -v
+    - go test
+    # - go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+    # - go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+    # - go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
 
 
 # compile:
