@@ -17,11 +17,9 @@ stages:
 test:
   stage: test
   script:
-    - CGO_ENABLED=0 go test ./... -coverprofile=coverage-report.out
-    - go tool cover -html=coverage-report.out -o coverage-report.html # HTML-format report
-    #- go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
-    #- go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
-    #- go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+    - go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+    - go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+    - go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
 
 
 # compile:
