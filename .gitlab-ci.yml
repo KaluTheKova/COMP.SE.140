@@ -12,12 +12,12 @@ image: golang:alpine
 stages:
   - test
 
-test:
-  stage: test
+end-to-end-test:
   script:
     - cd ./httpserv
     - go get -d -v
     - go run httpserv.go
+  stage: run-gateway-tests
     - cd ..
     - cd ./gateway
     - go get -d -v
