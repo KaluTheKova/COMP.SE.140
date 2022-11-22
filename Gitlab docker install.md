@@ -137,10 +137,9 @@ git fetch all project
 You cannot pull from multiple remotes, but you can fetch updates from multiple remotes with git fetch --all.
 
 ## TO DO
-- add https://github.com/stretchr/testify
 - unit tests to gateway
-- start developing
-- korjaa pipeline jos prakaa.
+- Pipeline prakaa: go: cannot find main module, but found .git/config in
+https://stackoverflow.com/questions/57182988/gitlab-ci-and-go-modules
 
 ## CURL COMMANDS
 curl localhost:8080

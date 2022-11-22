@@ -7,19 +7,44 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Go.gitlab-ci.yml
 
-image: golang:latest
+image: golang:alpine
 
 stages:
   - test
   # - build
-  # - deploy
+  - deploy
 
-format:
+test:
   stage: test
   script:
-    - go fmt ./gateway ./httpserv ./orig ./obse ./imed
-    - go vet ./gateway ./httpserv ./orig ./obse ./imed
-    - go test ./gateway ./httpserv ./orig ./obse ./imed
+    - CGO_ENABLED=0 go test ./... -coverprofile=coverage-report.out
+    - go tool cover -html=coverage-report.out -o coverage-report.html # HTML-format report
+    #- go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+    #- go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+    #- go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+  artifacts:
+      paths:
+        - coverage-report.html
+      expire_in: 1 days
+    coverage: "/\\(statements\\)\\s+\\d+.?\\d+%/"
+
+coverage-page:
+  stage: deploy
+  script:
+    - echo 'Cleaning old pages'
+    - rm -rf public
+    - ls -la
+    - mkdir -p public && cp coverage-report.html public/
+    - echo 'Public directory content after copying files'
+    - ls -la ./public
+  artifacts:
+    paths:
+      - public
+    expire_in: never
+  only:
+    - master
+    - develop
+
 
 # compile:
 #   stage: build

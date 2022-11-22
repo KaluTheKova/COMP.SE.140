@@ -1,0 +1,9 @@
+# Output of the go coverage tool
+*.out
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
