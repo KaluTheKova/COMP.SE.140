@@ -192,3 +192,5 @@ Gitlab admin -> settings -> network -> Outbound requests
 ----------
 Kai se ny on vaan pakko mockata unit testeille
 Paitsi että ongelma on ettei runnerit ollu yhistettynä networkiin ja siksi heittää erroria. ASD.
+
+- Kokeile uudestaan integraatiota nyt kun network_mode toimii

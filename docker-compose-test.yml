@@ -5,7 +5,7 @@ services:
     build: ./gateway
     ports:
       - "8083:8083"
-    command: ["CGO_ENABLED=0 go test go /app"]
+    command: ["ls", "CGO_ENABLED=0 go test go /app"]
     depends_on:
       - httpserv
 
@@ -15,7 +15,7 @@ services:
       - message-storage:/app
     ports:
       - "8080:8080"
-    command: ["go run /app/httpserv.go"]
+    command: ["ls", "go run /httpserv.go"]
   
 volumes:
   message-storage:
