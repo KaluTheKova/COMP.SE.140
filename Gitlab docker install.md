@@ -61,6 +61,7 @@ http://kuutlab.com
 
 RATKAISU: paina vaan "Enter" kun kysytään urlia. LOL.
 token: SasFrsDntzJHXpESQjEM
+new token: GR1348941NrpwYax3PvVyqzBpxjdy
 
 sudo nano gitlab/gitlab-runner/config.toml
 --------------------------------------
@@ -159,3 +160,20 @@ https://stackoverflow.com/questions/57182988/gitlab-ci-and-go-modules
 curl localhost:8080
 curl localhost:8083/messages
 curl -v -X GET localhost:8083/messages
+
+----------
+gitlab-runner register -n \
+  --url https://Gitlab_Url/ \
+  --registration-token TOKEN \
+  --executor docker \
+  --description "My Docker Runner" \
+  --docker-image "docker" \
+  --docker-privileged \
+  --docker-volumes "/certs/client"
+
+docker exec -it gitlab-runner gitlab-runner register --url "http://gitlab-ce" --clone-url "http://gitlab-ce" --docker-privileged
+docker exec -it gitlab-runner gitlab-runner verify
+
+docker exec -it gitlab-runner gitlab-runner register --url "http://gitlab-ce" --clone-url "docker:8081" --docker-privileged
+
+new token: GR1348941NrpwYax3PvVyqzBpxjdy
