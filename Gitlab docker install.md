@@ -194,3 +194,6 @@ Kai se ny on vaan pakko mockata unit testeille
 Paitsi että ongelma on ettei runnerit ollu yhistettynä networkiin ja siksi heittää erroria. ASD.
 
 - Kokeile uudestaan integraatiota nyt kun network_mode toimii
+
+compse140-httpserv-1  | ls: go run /httpserv.go: No such file or directory
+compse140-httpserv-1 exited with code 1
