@@ -1,7 +1,7 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Go.gitlab-ci.yml
 
-image: golang:alpine
+image: golang:latest
 
 stages:
   - test
@@ -9,6 +9,9 @@ stages:
 test:
   stage: test
   script:
+    - apt update 
+    - apt install curl
+    - curl --version 
     - echo "Waiting for 60 seconds..."
     - sleep 60
     - curl localhost:8081

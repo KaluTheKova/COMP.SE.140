@@ -172,11 +172,17 @@ gitlab-runner register -n \
   --docker-volumes "/certs/client"
 
 docker exec -it gitlab-runner gitlab-runner register --url "http://gitlab-ce" --clone-url "http://gitlab-ce" --docker-privileged
+
 docker exec -it gitlab-runner gitlab-runner verify
 
 docker exec -it gitlab-runner gitlab-runner register --url "http://gitlab-ce" --clone-url "docker:8081" --docker-privileged
 
 new token: GR1348941NrpwYax3PvVyqzBpxjdy
+
+docker logs gitlab-runner
+So, after these steps, you can find the toml file inside the container volume: /etc/gitlab-runner
+
+
 ----------
 fatal: unable to access 'http://localhost/gitlab-instance-9d36923c/COMP.SE.140.git/': Failed to connect to localhost port 80 after 0 ms: Connection refused
 
@@ -185,3 +191,4 @@ https://stackoverflow.com/questions/63766919/build-step-in-pipeline-is-failing-w
 Gitlab admin -> settings -> network -> Outbound requests
 ----------
 Kai se ny on vaan pakko mockata unit testeille
+Paitsi että ongelma on ettei runnerit ollu yhistettynä networkiin ja siksi heittää erroria. ASD.
