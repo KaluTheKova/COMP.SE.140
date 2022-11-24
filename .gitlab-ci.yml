@@ -13,11 +13,11 @@ test:
     - apt update 
     - apt install curl
     - curl --version 
-    - echo "Waiting for 60 seconds..."
-    - sleep 60
-    - curl localhost:8081
-    - curl docker:8081
-    - curl http://gitlab-ce:8081
+    - echo "Waiting for 20 seconds..."
+    - sleep 20
+    - curl localhost:8081 || true
+    - curl docker:8081 || true
+    - curl http://gitlab-ce:8081 || true
     #- docker-compose -f docker-compose-test.yml up --exit-code-from=gateway --force-recreate
     # - cd ./httpserv
     # - go get -d -v
