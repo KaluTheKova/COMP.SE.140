@@ -20,7 +20,10 @@ test:
   script:
     - echo "Waiting for 60 seconds..."
     - sleep 60
-    - docker-compose -f docker-compose-test.yml up --exit-code-from=gateway --force-recreate
+    - curl localhost:8081
+    - curl docker:8081
+    - curl http://gitlab-ce:8081
+    #- docker-compose -f docker-compose-test.yml up --exit-code-from=gateway --force-recreate
     # - cd ./httpserv
     # - go get -d -v
     # - go run httpserv.go & disown
