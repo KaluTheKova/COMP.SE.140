@@ -7,7 +7,7 @@ stages:
   - test
 
 test:
-  stage: setup-test
+  stage: test
   script:
     - docker-compose -f docker-compose-test.yml
     # - cd ./httpserv
