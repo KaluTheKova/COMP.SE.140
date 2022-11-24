@@ -3,8 +3,8 @@
 
 image: docker:latest
   
-services:
-  - docker:dind
+# services:
+#   - docker:dind
 
 stages:
   - test
