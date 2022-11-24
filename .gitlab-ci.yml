@@ -1,7 +1,10 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Go.gitlab-ci.yml
 
-image: golang:alpine
+image: docker:latest
+  
+services:
+  - docker:dind
 
 stages:
   - test
