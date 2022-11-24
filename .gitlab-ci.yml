@@ -8,6 +8,7 @@ stages:
 
 test:
   stage: test
+  allow_failure: true
   script:
     - apt update 
     - apt install curl
