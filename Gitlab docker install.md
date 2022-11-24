@@ -141,6 +141,8 @@ You cannot pull from multiple remotes, but you can fetch updates from multiple r
 - unit tests to gateway
 - Pipeline prakaa: go: cannot find main module, but found .git/config in
 https://stackoverflow.com/questions/57182988/gitlab-ci-and-go-modules
+- HOX: Hyödynnä Teemun https://gitlab.com/oliviasau/smart-home-designer/-/blob/master/docker-compose.dev.yml docker-compose in test - ideaa!
+
 - deployment to somewhere
 2. Unit tests for Gateway
 - mock API responses from API Gateway

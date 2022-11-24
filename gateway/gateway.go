@@ -13,19 +13,7 @@ const (
 	httpservAddress string = "http://localhost:8080/"
 )
 
-// album represents data about a record album.
-type album struct {
-	ID     string  `json:"id"`
-	Title  string  `json:"title"`
-	Artist string  `json:"artist"`
-	Price  float64 `json:"price"`
-}
-
-// albums slice to seed record album data.
-var albums = []album{
-	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+type Client interface {
 }
 
 // When requested, returns content of the file created by OBSE
@@ -60,8 +48,8 @@ func getMessages(c *gin.Context) {
 	c.String(http.StatusOK, string(respBody))
 }
 
-// GetMessagesAPICall executes http.Get to given address and returns bytecontent
-/* func getMessagesFromHttpserv(url string) []byte {
+/* // GetMessagesFromHttpserv executes http.Get to given address and returns bytecontent
+func GetMessagesFromHttpserv(url string) []byte {
 
 	log.Println("Received GET/messages") // DEBUG
 	resp, err := http.Get(url)

@@ -12,8 +12,31 @@ import (
 
 // https://apitest.dev/
 
+// https://go.dev/play/p/uYyvPHQyGZ
+
+// https://blog.canopas.com/golang-unit-tests-with-test-gin-context-80e1ac04adcd <-- Kokeile tätä
+
+/* func TestGetMessagesFromHttpserv(t *testing.T) {
+	mockResponse := []byte("2022-11-22T11:01:32.149Z 1 MSG_{1} to compse140.o\n2022-11-22T11:01:35.155Z 2 Got MSG_{2} to compse140.i\n2022-11-22T11:01:38.156Z 3 Got MSG_{3} to compse140.i")
+
+	// Create a response recorder so you can inspect the response
+	writer := httptest.NewRecorder()
+
+	// Router
+	gin.SetMode(gin.TestMode)
+	router := gin.Default()
+
+	// Create the mock request you'd like to test. Make sure the second argument
+	// here is the same as one of the routes you defined in the router setup block!
+	req, _ := http.NewRequest("GET", "/messages", nil)
+	router.ServeHTTP(writer, req)
+
+	assert.Equal(t, 200, writer.Code)
+	assert.Equal(t, string(mockResponse), writer.Body.String())
+} */
+
 // Needs to have httpserv running
-func TestGetMessagesAPICall(t *testing.T) {
+func TestGetMessages(t *testing.T) {
 	mockFilecontents := []byte("2022-11-22T11:01:32.149Z 1 MSG_{1} to compse140.o\n2022-11-22T11:01:35.155Z 2 Got MSG_{2} to compse140.i\n2022-11-22T11:01:38.156Z 3 Got MSG_{3} to compse140.i")
 	//mockFilecontents := []byte("2022-11-22T11:01:32.149Z 1 MSG_{1} to compse140.o" + "2022-11-22T11:01:35.155Z 2 Got MSG_{2} to compse140.i" + "2022-11-22T11:01:38.156Z 3 Got MSG_{3} to compse140.i")
 
@@ -26,3 +49,5 @@ func TestGetMessagesAPICall(t *testing.T) {
 	responseData, _ := ioutil.ReadAll(writer.Body)
 	assert.Equal(t, string(mockFilecontents), string(responseData), "Get test file contents from httpserv")
 }
+
+// Testissä Lähetä request curl -v -X GET localhost:8083/messages

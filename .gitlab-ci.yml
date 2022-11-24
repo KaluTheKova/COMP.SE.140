@@ -7,15 +7,17 @@ stages:
   - test
 
 test:
-  stage: test
+  stage: setup-test
   script:
-    - cd ./httpserv
-    - go get -d -v
-    - go run httpserv.go & disown
-    - cd ..
-    - cd ./gateway
-    - go get -d -v
-    - CGO_ENABLED=0 go test
+    - docker-compose -f docker-compose-test.yml
+    # - cd ./httpserv
+    # - go get -d -v
+    # - go run httpserv.go & disown
+    # - cd ..
+    # - cd ./gateway
+    # - go get -d -v
+    # - CGO_ENABLED=0 go test
+  
   
     # - go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
     # - go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
