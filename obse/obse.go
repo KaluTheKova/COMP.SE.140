@@ -63,7 +63,7 @@ func consumeMessagesFromQueue() {
 	// Bind
 	err = ch.QueueBind(
 		"mainQueue",    // queue name
-		"compse140.o",  // routing key
+		"compse140.#",  // routing key
 		"mainExchange", // exchange
 		false,
 		nil,
