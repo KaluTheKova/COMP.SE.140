@@ -79,7 +79,7 @@ func consumeMessagesFromQueue() {
 	msgs, err := ch.Consume(
 		queue.Name, // queue
 		"",         // consumer
-		true,       // auto-ack
+		false,      // auto-ack
 		false,      // exclusive
 		false,      // no-local
 		false,      // no-wait

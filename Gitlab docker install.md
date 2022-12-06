@@ -157,10 +157,11 @@ https://stackoverflow.com/questions/57182988/gitlab-ci-and-go-modules
 - Modify the ORIG service to send messages forever until pause paused or stopped.
 
 ## CURL COMMANDS
+curl localhost:8083/state -X PUT -d "PAUSED"
+curl localhost:8083/state -X PUT -d "RUNNING"
 curl localhost:8080
 curl localhost:8083/messages
 curl -v -X GET localhost:8083/messages
-curl localhost:8083/state -X PUT -d ”PAUSED”
 ----------
 gitlab-runner register -n \
   --url https://Gitlab_Url/ \
@@ -244,4 +245,11 @@ Kato saako binaryt testattua ja ajettua
 
 -----------
 TO DO:
-- RabbitMQ: tee viesteistä kestäviä, eli eivät katoa kun ne consumataan. Koska haistakaa paska.
+- RabbitMQ: tee viesteistä kestäviä, eli eivät katoa kun ne consumataan. Koska haistakaa paska. DONE
+- Tee getState testi
+- Implement getState (lue filestä state)
+- implement staten tallentaminen gatewayn tekstitiedostoon
+
+Ongelma: curl localhost:8083/state -X PUT -d "RUNNING" ei sais lukita vaan pitää palauttaa
+
+IMED ei ny lue taaskaan

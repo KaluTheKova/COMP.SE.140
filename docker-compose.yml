@@ -29,7 +29,7 @@ services:
   obse:
     build: ./obse
     volumes: 
-      - message-storage:/app # This accidentally overwrote the Dockerfile /app folder
+      - message-storage:/app/message-storage # This accidentally overwrote the Dockerfile /app folder
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -39,7 +39,7 @@ services:
   httpserv:
     build: ./httpserv
     volumes:
-      - message-storage:/app # This accidentally overwrote the Dockerfile /app folder
+      - message-storage:/app/message-storage # This accidentally overwrote the Dockerfile /app folder
     ports:
       - "8080:8080"
     depends_on:

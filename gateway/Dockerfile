@@ -7,8 +7,8 @@ COPY go.mod ./
 RUN go mod download
 
 #COPY *.go ./
-COPY . ./
+COPY . /app
 
-RUN go build -o /gateway
+RUN go build -o /app/gateway
 
-CMD [ "/gateway" ]
+CMD [ "/app/gateway" ]

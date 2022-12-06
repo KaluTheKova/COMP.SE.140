@@ -13,15 +13,15 @@ import (
 // GLOBALS
 var allTopics string = "compse.*"
 var rabbitMQAddress string = "amqp://guest:guest@rabbitmq:5672/"
-var filename string = "messages.txt"
-var path string = "/app"
+var filename string = "./message-storage/messages.txt"
+var path string = "/message-storage"
 
 // Subscribes to all messages within the network, therefore receiving from both compse140.o and compse140.i
 // Stores the messages into a file
 func main() {
 	log.Printf("OBSE STARTING") // DEBUG
 
-	clearFileOnStartup("messages.txt")
+	clearFileOnStartup(filename)
 
 	consumeMessagesFromQueue()
 }
@@ -63,7 +63,7 @@ func consumeMessagesFromQueue() {
 	// Bind
 	err = ch.QueueBind(
 		"mainQueue",    // queue name
-		"compse140.#",  // routing key
+		"#",            // routing key
 		"mainExchange", // exchange
 		false,
 		nil,

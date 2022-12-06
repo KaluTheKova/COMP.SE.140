@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -15,33 +18,59 @@ var sendingQueue = "compse140.o"
 
 // Publishes messages to TOPIC compse140.o
 // TOPIC compse140.o in RabbitMQ
-
-// TO DO: Modify the ORIG service to send messages forever until pause paused or stopped.
 func main() {
+	log.Printf("ORIG STARTING") // DEBUG
+	router := gin.Default()
+	router.PUT("/", stateHandler)
+	router.Run(":8085")
+}
 
-	log.Printf("ORIG STARTIGN") // DEBUG
+// Act based on PUT request payload
+func stateHandler(ginContext *gin.Context) {
+	log.Println("ORIG received PUT/state") // DEBUG
 
+	// Read put payload
+	payload, err := ioutil.ReadAll(ginContext.Request.Body)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	payloadString := string(payload)
+
+	log.Printf("ORIG payload: %s", payloadString)
+
+	// Cases
+	statePaused := "ORIG service paused"
+	stateRunning := "ORIG service running"
+
+	switch payloadString {
+	case "PAUSED":
+		ginContext.String(http.StatusOK, statePaused)
+		pauseService()
+	case "RUNNING":
+		ginContext.String(http.StatusOK, stateRunning)
+		runService()
+	}
+}
+
+func pauseService() {
+	log.Println("ORIG service paused") // DEBUG
+}
+
+func runService() {
+	log.Println("ORIG service running")
 	conn := initializeConnection(rabbitMQAddress)
 	defer conn.Close()
 
-	/* 	// Send messages forever TO DO
-	   	sendMessagesForever := true
-	   	i := 1
-	   	for sendMessagesForever == true {
-	   		message := createMessages(i)
-	   		sendMessageToRabbit(message, conn)
-	   		time.Sleep(3 * time.Second) // wait 3 seconds
-	   		i++
-	   	} */
-
-	// Send 3 messages to rabbitMQ
-	numOfMessages := 10
-	for i := 1; i < numOfMessages+1; i++ {
+	// Send messages forever TO DO
+	sendMessagesForever := true
+	i := 1
+	for sendMessagesForever == true {
 		message := createMessages(i)
 		sendMessageToRabbit(message, conn)
 		time.Sleep(3 * time.Second) // wait 3 seconds
+		i++
 	}
-
 }
 
 // createMessages Creates and returns string "MSG_{%v}" where %v is the int given as parameter
@@ -71,6 +100,14 @@ func sendMessageToRabbit(message string, conn *amqp.Connection) {
 	// cancel when ended
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
+	// Prefetch qos
+	err = ch.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
+	failOnError(err, "Failed to set QoS")
 
 	// message body
 	body := message

@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var filename string = "messages.txt"
+var filename string = "./message-storage/messages.txt"
 
 // When requested, returns content of the file created by OBSE
 func main() {
