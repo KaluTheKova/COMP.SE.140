@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -50,13 +51,17 @@ func (c CustomClient) GetMessages(url string) string {
 }
 
 // PutState sends payload to given address. INIT, PAUSED, RUNNING, SHUTDOWN.
-func (c CustomClient) PutState(url string) string {
+func (c CustomClient) PutState(url string, payload string) string {
 
-	resp, err := c.Get(url)
+	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(payload))
 	if err != nil {
 		log.Panic(err)
 	}
-	defer resp.Body.Close()
+
+	resp, err := c.Do(req)
+	if err != nil {
+		log.Panic(err)
+	}
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {

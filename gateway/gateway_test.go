@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var expectedFileContents string = "2022-11-22T11:01:32.149Z 1 MSG_{1} to compse140.o\n2022-11-22T11:01:35.155Z 2 Got MSG_{2} to compse140.i\n2022-11-22T11:01:38.156Z 3 Got MSG_{3} to compse140.i\n"
-var mockFilecontents string = "2022-11-22T11:01:32.149Z 1 MSG_{1} to compse140.o\n2022-11-22T11:01:35.155Z 2 Got MSG_{2} to compse140.i\n2022-11-22T11:01:38.156Z 3 Got MSG_{3} to compse140.i"
-
 func TestGetMessages(t *testing.T) {
+	var expectedFileContents string = "2022-11-22T11:01:32.149Z 1 MSG_{1} to compse140.o\n2022-11-22T11:01:35.155Z 2 Got MSG_{2} to compse140.i\n2022-11-22T11:01:38.156Z 3 Got MSG_{3} to compse140.i\n"
+	var mockFilecontents string = "2022-11-22T11:01:32.149Z 1 MSG_{1} to compse140.o\n2022-11-22T11:01:35.155Z 2 Got MSG_{2} to compse140.i\n2022-11-22T11:01:38.156Z 3 Got MSG_{3} to compse140.i"
+
 	testServer := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
 		fmt.Fprintln(writer, mockFilecontents)
 	}))
@@ -27,6 +27,14 @@ func TestGetMessages(t *testing.T) {
 	resp := testClient.GetMessages(mockServerURL)
 
 	assert.Equal(t, expectedFileContents, resp)
+}
+
+func TestPutState(t *testing.T) {
+	testServer := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		fmt.Fprintln(writer, "Received PUT")
+	}))
+	defer testServer.Close()
+
 }
 
 /* func TestGetMessagesFromHttpserv(t *testing.T) {

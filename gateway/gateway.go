@@ -52,6 +52,7 @@ func putState(c *gin.Context) {
 	log.Println("Received PUT/state") // DEBUG
 
 	//customClient := NewCustomClient()
+	//customClient.PutState()
 }
 
 // GET /state (as text/plain)
