@@ -50,14 +50,14 @@ func getMessages(ginContext *gin.Context) {
 // SHUTDOWN = all containers are stopped
 func putState(ginContext *gin.Context) {
 	log.Println("Received PUT/state") // DEBUG
-	//payload := ginContext.Request.Body()
+	payload := ginContext.PostForm("LOLOL")
 	//payload := ginContext.Bind
 
-	//log.Printf("Payload: %s", payload)
+	log.Printf("Payload: %s", payload)
 
 	// customClient := NewCustomClient()
 	// resp := customClient.PutState(httpservAddress, "x")
-	// ginContext.String(http.StatusOK, resp)
+	ginContext.String(http.StatusOK, "Payload is: %s", payload)
 }
 
 // GET /state (as text/plain)
