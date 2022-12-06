@@ -40,24 +40,6 @@ func getMessages(ginContext *gin.Context) {
 	ginContext.String(http.StatusOK, string(resp))
 }
 
-/* // GetMessagesFromHttpserv executes http.Get to given address and returns bytecontent
-func GetMessagesFromHttpserv(url string) []byte {
-
-	log.Println("Received GET/messages") // DEBUG
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Println(err)
-	}
-	defer resp.Body.Close()
-
-	log.Println("Reading response") // DEBUG
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-	}
-	return respBody
-} */
-
 // PUT /state (payload “INIT”, “PAUSED”, “RUNNING”, “SHUTDOWN”)
 // PAUSED = ORIG service is not sending messages
 // RUNNING = ORIG service sends messages
@@ -67,7 +49,9 @@ func GetMessagesFromHttpserv(url string) []byte {
 // initial state and ORIG starts sending again, state is set to RUNNING
 // SHUTDOWN = all containers are stopped
 func putState(c *gin.Context) {
+	log.Println("Received PUT/state") // DEBUG
 
+	//customClient := NewCustomClient()
 }
 
 // GET /state (as text/plain)

@@ -20,7 +20,8 @@ test:
   script:
     - echo "Waiting for 30 seconds..."
     - sleep 30
-    - docker-compose -f docker-compose-test.yml up --exit-code-from=gateway --force-recreate
+    - go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+    # - docker-compose -f docker-compose-test.yml up --exit-code-from=gateway --force-recreate # This can be used for E2E
     # - cd ./httpserv
     # - go get -d -v
     # - go run httpserv.go & disown
@@ -28,7 +29,6 @@ test:
     # - cd ./gateway
     # - go get -d -v
     # - CGO_ENABLED=0 go test
-  
   
     # - go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
     # - go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/

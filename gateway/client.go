@@ -48,3 +48,19 @@ func (c CustomClient) GetMessages(url string) string {
 	}
 	return string(respBody)
 }
+
+// PutState sends payload to given address. INIT, PAUSED, RUNNING, SHUTDOWN.
+func (c CustomClient) PutState(url string) string {
+
+	resp, err := c.Get(url)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Panic(err)
+	}
+	return string(respBody)
+}
