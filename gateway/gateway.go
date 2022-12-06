@@ -50,7 +50,7 @@ func getMessages(ginContext *gin.Context) {
 // SHUTDOWN = all containers are stopped
 func putState(ginContext *gin.Context) {
 	log.Println("Received PUT/state") // DEBUG
-	payload := ginContext.PostForm("LOL")
+	payload := ginContext.Bind
 
 	log.Printf("Payload: %s", payload)
 
