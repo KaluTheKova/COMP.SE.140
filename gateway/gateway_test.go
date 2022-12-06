@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+// https://chenyitian.gitbooks.io/gin-web-framework/content/docs/7.html
 
 func TestGetMessages(t *testing.T) {
 	var expectedFileContents string = "2022-11-22T11:01:32.149Z 1 MSG_{1} to compse140.o\n2022-11-22T11:01:35.155Z 2 Got MSG_{2} to compse140.i\n2022-11-22T11:01:38.156Z 3 Got MSG_{3} to compse140.i\n"
@@ -34,6 +37,16 @@ func TestPutState(t *testing.T) {
 		fmt.Fprintln(writer, "Received PUT")
 	}))
 	defer testServer.Close()
+
+	mockServerURL := testServer.URL
+
+	// Create test client
+	testClient := NewCustomTestClient()
+	defer testClient.CloseIdleConnections()
+
+	resp := testClient.PutState(mockServerURL, "INIT")
+
+	log.Println("DEBUG:", resp)
 
 }
 

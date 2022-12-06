@@ -48,11 +48,15 @@ func getMessages(ginContext *gin.Context) {
 // INIT = everything (except log information for /run-log and /messages) is in the
 // initial state and ORIG starts sending again, state is set to RUNNING
 // SHUTDOWN = all containers are stopped
-func putState(c *gin.Context) {
+func putState(ginContext *gin.Context) {
 	log.Println("Received PUT/state") // DEBUG
+	payload := ginContext.PostForm("LOL")
 
-	//customClient := NewCustomClient()
-	//customClient.PutState()
+	log.Printf("Payload: %s", payload)
+
+	// customClient := NewCustomClient()
+	// resp := customClient.PutState(httpservAddress, "x")
+	// ginContext.String(http.StatusOK, resp)
 }
 
 // GET /state (as text/plain)
