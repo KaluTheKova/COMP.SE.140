@@ -17,8 +17,8 @@ image: golang:alpine
 stages:
   - unit-test
 
-unit-test:
-  stage: test
+test:
+  stage: unit-test
   script:
     - echo "Waiting for 30 seconds..."
     - sleep 30
