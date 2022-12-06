@@ -23,7 +23,7 @@ test:
     - echo "Waiting for 30 seconds..."
     - sleep 30
     - cd ./gateway
-    - go test ./gateway
+    - go test
     # - docker-compose -f docker-compose-test.yml up --exit-code-from=gateway --force-recreate # This can be used for E2E
     # - cd ./httpserv
     # - go get -d -v
