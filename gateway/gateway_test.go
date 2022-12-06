@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,22 +33,49 @@ func TestGetMessages(t *testing.T) {
 }
 
 func TestPutState(t *testing.T) {
-
-	testServer := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
-		fmt.Fprintln(writer, "ORIG service paused")
-	}))
-	defer testServer.Close()
-
-	mockServerURL := testServer.URL
+	cases := []struct {
+		input    []string
+		response []string
+		expected []string
+	}{
+		{
+			input:    []string{"INIT"},
+			response: []string{"ORIG service set to initial state"},
+			expected: []string{"ORIG service set to initial state"},
+		},
+		{
+			input:    []string{"PAUSED"},
+			response: []string{"ORIG service paused"},
+			expected: []string{"ORIG service paused"},
+		},
+		{
+			input:    []string{"RUNNING"},
+			response: []string{"ORIG service running"},
+			expected: []string{"ORIG service running"},
+		},
+		{
+			input:    []string{"SHUTDOWN"},
+			response: []string{"ORIG service shutting down"},
+			expected: []string{"ORIG service shutting down"},
+		},
+	}
 
 	// Create test client
 	testClient := NewCustomTestClient()
 	defer testClient.CloseIdleConnections()
 
-	resp := testClient.PutState(mockServerURL, "PAUSED")
+	// Loop through all inputs and expected data
+	for _, testCase := range cases {
+		testServer := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+			fmt.Fprintln(writer, testCase.response)
+		}))
+		defer testServer.Close()
 
-	assert.Equal(t, "ORIG service paused\n", resp)
+		mockServerURL := testServer.URL
+		resp := testClient.PutState(mockServerURL, fmt.Sprint(testCase.input))
 
+		assert.Equal(t, fmt.Sprint(testCase.expected), strings.ReplaceAll(resp, "\n", ""))
+	}
 }
 
 /* func TestGetMessagesFromHttpserv(t *testing.T) {
