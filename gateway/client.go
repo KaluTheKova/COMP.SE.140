@@ -58,6 +58,8 @@ func (c CustomClient) PutState(url string, payload string) string {
 		log.Panic(err)
 	}
 
+	//log.Println("req: ", string(req.Body))
+
 	resp, err := c.Do(req)
 	if err != nil {
 		log.Panic(err)

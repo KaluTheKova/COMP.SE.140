@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -33,8 +32,9 @@ func TestGetMessages(t *testing.T) {
 }
 
 func TestPutState(t *testing.T) {
+
 	testServer := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
-		fmt.Fprintln(writer, "Received PUT")
+		fmt.Fprintln(writer, "ORIG service paused")
 	}))
 	defer testServer.Close()
 
@@ -44,9 +44,9 @@ func TestPutState(t *testing.T) {
 	testClient := NewCustomTestClient()
 	defer testClient.CloseIdleConnections()
 
-	resp := testClient.PutState(mockServerURL, "INIT")
+	resp := testClient.PutState(mockServerURL, "PAUSED")
 
-	log.Println("DEBUG:", resp)
+	assert.Equal(t, "ORIG service paused\n", resp)
 
 }
 

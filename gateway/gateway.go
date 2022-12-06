@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -50,14 +51,19 @@ func getMessages(ginContext *gin.Context) {
 // SHUTDOWN = all containers are stopped
 func putState(ginContext *gin.Context) {
 	log.Println("Received PUT/state") // DEBUG
-	payload := ginContext.PostForm("LOLOL")
-	//payload := ginContext.Bind
+
+	// Read put payload
+	payload, err := ioutil.ReadAll(ginContext.Request.Body)
+	if err != nil {
+		log.Panic(err)
+	}
 
 	log.Printf("Payload: %s", payload)
 
-	// customClient := NewCustomClient()
-	// resp := customClient.PutState(httpservAddress, "x")
-	ginContext.String(http.StatusOK, "Payload is: %s", payload)
+	customClient := NewCustomClient()
+	resp := customClient.PutState(httpservAddress, string(payload))
+
+	ginContext.String(http.StatusOK, resp)
 }
 
 // GET /state (as text/plain)

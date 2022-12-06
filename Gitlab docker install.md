@@ -160,10 +160,7 @@ https://stackoverflow.com/questions/57182988/gitlab-ci-and-go-modules
 curl localhost:8080
 curl localhost:8083/messages
 curl -v -X GET localhost:8083/messages
-curl localhost:8083/state -X PUT -d ”PAUSED” \
--H ”Content-Type: text/plain”
--H ”Accept: text/plain” (except node-statistics)
-
+curl localhost:8083/state -X PUT -d ”PAUSED”
 ----------
 gitlab-runner register -n \
   --url https://Gitlab_Url/ \
