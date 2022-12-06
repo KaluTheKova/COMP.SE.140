@@ -6,7 +6,6 @@ services:
     ports:
       - "8083:8083"
     command: ["CGO_ENABLED=0 go test go /app"]
-    #command: ["CGO_ENABLED=0 go test go /app"]
     depends_on:
       - httpserv
 
@@ -16,8 +15,7 @@ services:
       - message-storage:/app
     ports:
       - "8080:8080"
-    command: ["ls"]
-    #command: ["go run /httpserv.go"]
+    command: ["go run /app/httpserv.go"]
   
 volumes:
   message-storage:

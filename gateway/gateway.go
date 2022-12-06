@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
 
@@ -32,20 +31,13 @@ func main() {
 // GET /messages (as text/plain)
 // Returns all message registered with OBSE-service. Assumed implementation
 // forwards the request to HTTPSERV and returns the result.
-func getMessages(c *gin.Context) {
+func getMessages(ginContext *gin.Context) {
 	log.Println("Received GET/messages") // DEBUG
-	resp, err := http.Get(httpservAddress)
-	if err != nil {
-		log.Println(err)
-	}
-	defer resp.Body.Close()
 
-	log.Println("Reading response") // DEBUG
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-	}
-	c.String(http.StatusOK, string(respBody))
+	customClient := NewCustomClient()
+	resp := customClient.GetMessages(httpservAddress)
+
+	ginContext.String(http.StatusOK, string(resp))
 }
 
 /* // GetMessagesFromHttpserv executes http.Get to given address and returns bytecontent

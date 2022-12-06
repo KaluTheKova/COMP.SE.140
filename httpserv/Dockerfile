@@ -7,8 +7,8 @@ COPY go.mod ./
 RUN go mod download
 
 #COPY *.go ./
-COPY . /app
+COPY . ./
 
-RUN go build -o /app/httpserv
+RUN go build -o /httpserv
 
-CMD [ "/app/httpserv" ]
+CMD [ "/httpserv" ]

@@ -197,3 +197,51 @@ Paitsi että ongelma on ettei runnerit ollu yhistettynä networkiin ja siksi hei
 
 compse140-httpserv-1  | ls: go run /httpserv.go: No such file or directory
 compse140-httpserv-1 exited with code 1
+
+sudo apt-get install tree, katso kansiorakenne
+
+#14 [compse140-gateway 4/6] RUN go mod download
+#14 DONE 71.7s
+#17 [compse140-gateway 5/6] COPY . /app
+#17 DONE 0.1s
+#18 [compse140-gateway 6/6] RUN go build -o /app/gateway
+#18 DONE 3.4s
+#16 [compse140-gateway] exporting to image
+#16 exporting layers
+#16 exporting layers 0.8s done
+#16 writing image sha256:6dd1922242479d915b244bd6716ee2713b711cb47d96393daa564d2359ee89ee done
+#16 naming to docker.io/library/compse140-gateway done
+#16 DONE 0.9s
+Network compse140_default  Creating
+Network compse140_default  Created
+Volume "compse140_message-storage"  Creating
+Volume "compse140_message-storage"  Created
+Container compse140-httpserv-1  Creating
+Container compse140-httpserv-1  Created
+Container compse140-gateway-1  Creating
+Container compse140-gateway-1  Created
+Attaching to compse140-gateway-1, compse140-httpserv-1
+compse140-httpserv-1  | Dockerfile
+compse140-httpserv-1  | go.mod
+compse140-httpserv-1  | go.sum
+compse140-httpserv-1  | httpserv
+compse140-httpserv-1  | httpserv.go
+compse140-httpserv-1  | httpserv_test.go
+compse140-httpserv-1  | messages.txt
+compse140-httpserv-1 exited with code 0
+Aborting on container exit...
+Container compse140-gateway-1  Stopping
+Container compse140-gateway-1  Stopped
+Container compse140-httpserv-1  Stopping
+Error response from daemon: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: exec: "CGO_ENABLED=0 go test go /app": stat CGO_ENABLED=0 go test go /app: no such file or directory: unknown
+
+Aaah, tiedostot ei kopioidu. Test - filet jää pois.
+
+go test -c -o foo if I remember correctly will compile all your tests into the executable binary named foo.
+
+See: https://golang.org/pkg/cmd/go/internal/test/
+Kato saako binaryt testattua ja ajettua
+
+-----------
+TO DO:
+- RabbitMQ: tee viesteistä kestäviä, eli eivät katoa kun ne consumataan. Koska haistakaa paska.

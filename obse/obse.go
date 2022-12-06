@@ -52,7 +52,7 @@ func consumeMessagesFromQueue() {
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
 		"mainQueue", // name
-		false,       // durable
+		true,        // durable
 		false,       // delete when unused
 		false,       // exclusive
 		false,       // no-wait
