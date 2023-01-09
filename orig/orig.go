@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +13,14 @@ import (
 
 // GLOBALS
 var rabbitMQAddress string = "amqp://guest:guest@rabbitmq:5672/"
-var sendingQueue = "compse140.o"
+var routingKey = "compse140.o"
+var conn, connErr = amqp.Dial(rabbitMQAddress)
+var ch, chErr = conn.Channel()
+var start = make(chan struct{})
+var pause = make(chan struct{})
+var quit = make(chan struct{})
+var wg sync.WaitGroup
+var i = 1
 
 // Publishes messages to TOPIC compse140.o
 // TOPIC compse140.o in RabbitMQ
@@ -27,50 +33,73 @@ func main() {
 
 // Act based on PUT request payload
 func stateHandler(ginContext *gin.Context) {
-	log.Println("ORIG received PUT/state") // DEBUG
+	runService()
 
-	// Read put payload
-	payload, err := ioutil.ReadAll(ginContext.Request.Body)
-	if err != nil {
-		log.Panic(err)
-	}
+	/* 	// Read put payload
+	   	payload, err := ioutil.ReadAll(ginContext.Request.Body)
+	   	if err != nil {
+	   		log.Panic(err)
+	   	}
 
-	payloadString := string(payload)
+	   	payloadString := string(payload)
 
-	log.Printf("ORIG payload: %s", payloadString)
+	   	log.Printf("ORIG payload: %s", payloadString)
 
-	// Cases
-	statePaused := "ORIG service paused"
-	stateRunning := "ORIG service running"
+	   	// Cases
+	   	statePaused := "ORIG service paused\n"
+	   	stateRunning := "ORIG service running\n" */
 
-	switch payloadString {
-	case "PAUSED":
-		ginContext.String(http.StatusOK, statePaused)
-		pauseService()
-	case "RUNNING":
-		ginContext.String(http.StatusOK, stateRunning)
-		runService()
-	}
 }
 
-func pauseService() {
-	log.Println("ORIG service paused") // DEBUG
-}
+// func routine() {
+// 	for {
+// 		select {
+// 		case <-pause:
+// 			log.Println("ORIG service paused")
+// 			// ch.Cancel("", true)
+// 			// conn.Close()
+// 			select {
+// 			case <-play:
+// 				log.Println("ORIG service running")
+// 				runService()
+// 			case <-quit:
+// 				wg.Done()
+// 				return
+// 			}
+// 		case <-quit:
+// 			wg.Done()
+// 			return
+// 		default:
+// 			runService()
+// 		}
+// 	}
+// }
+
+// func pauseService() {
+// 	ch.Cancel()
+// 	log.Println("ORIG service paused") // DEBUG
+// 	conn.Close()
+// 	ch.Close()
+// 	return
+// }
 
 func runService() {
 	log.Println("ORIG service running")
 	conn := initializeConnection(rabbitMQAddress)
 	defer conn.Close()
 
-	// Send messages forever TO DO
-	sendMessagesForever := true
-	i := 1
-	for sendMessagesForever == true {
+	// create channel
+	ch, err := conn.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()
+
+	for {
 		message := createMessages(i)
-		sendMessageToRabbit(message, conn)
+		sendMessageToRabbit(message, ch)
 		time.Sleep(3 * time.Second) // wait 3 seconds
 		i++
 	}
+
 }
 
 // createMessages Creates and returns string "MSG_{%v}" where %v is the int given as parameter
@@ -79,14 +108,14 @@ func createMessages(numOfMessage int) string {
 	return message
 }
 
-func sendMessageToRabbit(message string, conn *amqp.Connection) {
-	// create channel
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
+func sendMessageToRabbit(message string, ch *amqp.Channel) {
+	// // create channel
+	// ch, err := conn.Channel()
+	// failOnError(err, "Failed to open a channel")
+	// defer ch.Close()
 
 	// Exchange
-	err = ch.ExchangeDeclare(
+	err := ch.ExchangeDeclare(
 		"mainExchange", // name
 		"topic",        // type TOPIC?
 		true,           // durable
@@ -113,7 +142,7 @@ func sendMessageToRabbit(message string, conn *amqp.Connection) {
 	body := message
 	err = ch.PublishWithContext(ctx,
 		"mainExchange", // exchange
-		sendingQueue,   // routing key
+		routingKey,     // routing key
 		false,          // mandatory
 		false,          // immediate
 		amqp.Publishing{

@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
 )
 
@@ -57,7 +60,16 @@ func putState(ginContext *gin.Context) {
 
 	log.Printf("Gateway payload: %s", payloadString)
 
+	// Handle incorrect input
+	if payloadString != "INIT" && payloadString != "PAUSED" && payloadString != "RUNNING" && payloadString != "SHUTDOWN" {
+		ginContext.String(http.StatusOK, fmt.Sprintf("PUT %s not valid input", payloadString))
+	}
+
+	// Initialize client
 	customClient := NewCustomClient()
+
+	// Docker Client
+	dockerClient := createDockerClient()
 
 	// GET CURRENT STATE. If current state == payload, nothing happens.
 	//state := readState()
@@ -78,12 +90,14 @@ func putState(ginContext *gin.Context) {
 		ginContext.String(http.StatusOK, resp)
 	case "PAUSED":
 		// Pause ORIG
-		resp := customClient.PutState(origAddress, string(payload))
-		ginContext.String(http.StatusOK, resp)
+		//resp := customClient.PutState(origAddress, string(payload))
+		pauseContainer(dockerClient, "compse140-orig-1")
+		ginContext.String(http.StatusOK, "ORIG paused")
 	case "RUNNING":
 		// Start ORIG
-		resp := customClient.PutState(origAddress, string(payload))
-		ginContext.String(http.StatusOK, resp)
+		//resp := customClient.PutState(origAddress, string(payload))
+		unpauseContainer(dockerClient, "compse140-orig-1")
+		ginContext.String(http.StatusOK, "ORIG running")
 	case "SHUTDOWN":
 		// Shutdown all containers
 		// https://gist.github.com/frikky/e2efcea6c733ea8d8d015b7fe8a91bf6
@@ -131,4 +145,31 @@ func writeStateToFile(filename string, message string) {
 	file.Sync()
 
 	//log.Printf("WROTE TO FILENAME %v MESSAGE %v\n", filename, message) // DEBUG
+}
+
+func createDockerClient() *client.Client {
+	client, err := client.NewEnvClient()
+	if err != nil {
+		fmt.Printf("Unable to create docker client: %s", err)
+	}
+
+	return client
+}
+
+func pauseContainer(client *client.Client, containerName string) {
+	ctx := context.Background()
+
+	err := client.ContainerPause(ctx, containerName)
+	if err != nil {
+		log.Panic("Unable to stop container %s: %s", containerName, err)
+	}
+}
+
+func unpauseContainer(client *client.Client, containerName string) {
+	ctx := context.Background()
+
+	err := client.ContainerUnpause(ctx, containerName)
+	if err != nil {
+		log.Panic("Unable to stop container %s: %s", containerName, err)
+	}
 }

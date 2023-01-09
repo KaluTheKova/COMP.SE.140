@@ -51,18 +51,18 @@ func consumeMessagesFromQueue() {
 
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
-		"mainQueue", // name
-		true,        // durable
-		false,       // delete when unused
-		false,       // exclusive
-		false,       // no-wait
-		nil,         // arguments
+		"",    // name
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
 	// Bind
 	err = ch.QueueBind(
-		"mainQueue",    // queue name
+		"",             // queue name
 		"#",            // routing key
 		"mainExchange", // exchange
 		false,
@@ -70,13 +70,13 @@ func consumeMessagesFromQueue() {
 	)
 	failOnError(err, "Failed to bind a queue")
 
-	// Prefect QoS
-	err = ch.Qos(
-		1,     // prefetch count
-		0,     // prefetch size
-		false, // global
-	)
-	failOnError(err, "Failed to set QoS")
+	// // Prefect QoS
+	// err = ch.Qos(
+	// 	1,     // prefetch count
+	// 	0,     // prefetch size
+	// 	false, // global
+	// )
+	// failOnError(err, "Failed to set QoS")
 
 	// Consume messages
 	msgs, err := ch.Consume(

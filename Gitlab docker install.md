@@ -162,7 +162,8 @@ curl localhost:8083/state -X PUT -d "RUNNING"
 curl localhost:8080
 curl localhost:8083/messages
 curl -v -X GET localhost:8083/messages
-----------
+
+## GITLAB RUNNER REGISTER
 gitlab-runner register -n \
   --url https://Gitlab_Url/ \
   --registration-token TOKEN \
@@ -250,6 +251,15 @@ TO DO:
 - Implement getState (lue filestä state)
 - implement staten tallentaminen gatewayn tekstitiedostoon
 
-Ongelma: curl localhost:8083/state -X PUT -d "RUNNING" ei sais lukita vaan pitää palauttaa
+ONGELMA: curl localhost:8083/state -X PUT -d "RUNNING" ei sais lukita vaan pitää palauttaa vastaus. Ratkaise.
 
-IMED ei ny lue taaskaan
+ONGELMA: IMED ei ny lue taaskaan. Kysy Sepolta prefetchin asetukset
+
+ONGELMA: Pause ei toimi. Täytyy jotenkin lukita channelit kokonaan. Tai close ja reopen connection + channel
+
+https://stackoverflow.com/questions/32864644/rabbitmq-multiple-consumers-on-a-queue-only-one-get-the-message
+
+https://www.ribice.ba/golang-rabbitmq-client/
+
+Mitä jos pausettais vain container executionin? :>>>>
+https://docs.docker.com/engine/reference/commandline/pause/

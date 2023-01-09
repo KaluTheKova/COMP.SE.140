@@ -10,8 +10,8 @@ import (
 )
 
 // GLOBALS
-var consumedQueue = "compse140.o"
-var sendingQueue = "compse140.i"
+var consumedRountingKey = "compse140.o"
+var sendingRoutingKey = "compse140.i"
 var rabbitMQAddress string = "amqp://guest:guest@rabbitmq:5672/"
 
 // Subscribes for messages from compse140.o
@@ -48,38 +48,38 @@ func consumeMessagesFromQueue() {
 
 	// Declare queue. In case consumer starts before publisher. We need to make sure queue exists.
 	queue, err := ch.QueueDeclare(
-		"mainQueue", // name
-		true,        // durable
-		false,       // delete when unused
-		false,       // exclusive
-		false,       // no-wait
-		nil,         // arguments
+		"",    // name
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
 	// Bind
 	err = ch.QueueBind(
-		"mainQueue",    // queue name
-		consumedQueue,  // routing key
-		"mainExchange", // exchange
+		"",                  // queue name
+		consumedRountingKey, // routing key
+		"mainExchange",      // exchange
 		false,
 		nil,
 	)
 	failOnError(err, "Failed to bind a queue")
 
-	// Prefect QoS
-	err = ch.Qos(
-		1,     // prefetch count
-		0,     // prefetch size
-		false, // global
-	)
-	failOnError(err, "Failed to set QoS")
+	// // Prefect QoS
+	// err = ch.Qos(
+	// 	1,     // prefetch count
+	// 	0,     // prefetch size
+	// 	false, // global
+	// )
+	// failOnError(err, "Failed to set QoS")
 
 	// Consume messages
 	msgs, err := ch.Consume(
 		queue.Name, // queue
 		"",         // consumer
-		false,      // auto-ack
+		true,       // auto-ack
 		false,      // exclusive
 		false,      // no-local
 		false,      // no-wait
@@ -118,12 +118,12 @@ func sendMessageToQueue(message string) {
 
 	// declare queue
 	queue, err := ch.QueueDeclare(
-		"mainQueue", // name
-		true,        // durable
-		false,       // delete when unused
-		false,       // exclusive
-		false,       // no-wait
-		nil,         // arguments
+		"",    // name
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
@@ -134,10 +134,10 @@ func sendMessageToQueue(message string) {
 	// message body
 	body := message
 	err = ch.PublishWithContext(ctx,
-		"mainExchange", // exchange
-		sendingQueue,   // routing key
-		false,          // mandatory
-		false,          // immediate
+		"mainExchange",    // exchange
+		sendingRoutingKey, // routing key
+		false,             // mandatory
+		false,             // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(body),
