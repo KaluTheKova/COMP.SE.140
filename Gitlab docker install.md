@@ -263,3 +263,5 @@ https://www.ribice.ba/golang-rabbitmq-client/
 
 Mitä jos pausettais vain container executionin? :>>>>
 https://docs.docker.com/engine/reference/commandline/pause/
+
+Jos ei onnistu niin tee erilliset handlefuncit origiin

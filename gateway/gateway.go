@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
 )
@@ -70,7 +71,7 @@ func putState(ginContext *gin.Context) {
 
 	// Docker Client
 	dockerClient := createDockerClient()
-
+	defer dockerClient.Close()
 	// GET CURRENT STATE. If current state == payload, nothing happens.
 	//state := readState()
 
@@ -92,15 +93,17 @@ func putState(ginContext *gin.Context) {
 		// Pause ORIG
 		//resp := customClient.PutState(origAddress, string(payload))
 		pauseContainer(dockerClient, "compse140-orig-1")
-		ginContext.String(http.StatusOK, "ORIG paused")
+		ginContext.String(http.StatusOK, "ORIG paused\n")
 	case "RUNNING":
 		// Start ORIG
 		//resp := customClient.PutState(origAddress, string(payload))
 		unpauseContainer(dockerClient, "compse140-orig-1")
-		ginContext.String(http.StatusOK, "ORIG running")
+		ginContext.String(http.StatusOK, "ORIG running\n")
 	case "SHUTDOWN":
 		// Shutdown all containers
 		// https://gist.github.com/frikky/e2efcea6c733ea8d8d015b7fe8a91bf6
+		listContainers(dockerClient)
+		ginContext.String(http.StatusOK, "Listed containers\n")
 	}
 }
 
@@ -148,9 +151,14 @@ func writeStateToFile(filename string, message string) {
 }
 
 func createDockerClient() *client.Client {
-	client, err := client.NewEnvClient()
+	// client, err := client.NewEnvClient()
+	// if err != nil {
+	// 	fmt.Printf("Unable to create docker client: %s", err)
+	// }
+
+	client, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		fmt.Printf("Unable to create docker client: %s", err)
+		log.Panicf("Unable to create docker client: %s", err)
 	}
 
 	return client
@@ -161,7 +169,7 @@ func pauseContainer(client *client.Client, containerName string) {
 
 	err := client.ContainerPause(ctx, containerName)
 	if err != nil {
-		log.Panic("Unable to stop container %s: %s", containerName, err)
+		log.Panicf("Unable to stop container %v: %v", containerName, err)
 	}
 }
 
@@ -170,6 +178,18 @@ func unpauseContainer(client *client.Client, containerName string) {
 
 	err := client.ContainerUnpause(ctx, containerName)
 	if err != nil {
-		log.Panic("Unable to stop container %s: %s", containerName, err)
+		log.Panicf("Unable to stop container %s: %s", containerName, err)
+	}
+}
+
+func listContainers(client *client.Client) {
+	ctx := context.Background()
+	container, err := client.ContainerList(ctx, types.ContainerListOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	for _, container := range container {
+		fmt.Println(container.ID, container.Image)
 	}
 }

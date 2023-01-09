@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -26,30 +25,31 @@ var i = 1
 // TOPIC compse140.o in RabbitMQ
 func main() {
 	log.Printf("ORIG STARTING") // DEBUG
-	router := gin.Default()
-	router.PUT("/", stateHandler)
-	router.Run(":8085")
-}
-
-// Act based on PUT request payload
-func stateHandler(ginContext *gin.Context) {
 	runService()
-
-	/* 	// Read put payload
-	   	payload, err := ioutil.ReadAll(ginContext.Request.Body)
-	   	if err != nil {
-	   		log.Panic(err)
-	   	}
-
-	   	payloadString := string(payload)
-
-	   	log.Printf("ORIG payload: %s", payloadString)
-
-	   	// Cases
-	   	statePaused := "ORIG service paused\n"
-	   	stateRunning := "ORIG service running\n" */
-
+	// router := gin.Default()
+	// router.PUT("/", stateHandler)
+	// router.Run(":8085")
 }
+
+// // Act based on PUT request payload
+// func stateHandler(ginContext *gin.Context) {
+// 	runService()
+
+// 	// Read put payload
+// 	payload, err := ioutil.ReadAll(ginContext.Request.Body)
+// 	if err != nil {
+// 		log.Panic(err)
+// 	}
+
+// 	payloadString := string(payload)
+
+// 	log.Printf("ORIG payload: %s", payloadString)
+
+// 	// Cases
+// 	statePaused := "ORIG service paused\n"
+// 	stateRunning := "ORIG service running\n"
+
+// }
 
 // func routine() {
 // 	for {
