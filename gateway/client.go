@@ -53,12 +53,11 @@ func (c CustomClient) GetMessages(url string) string {
 // PutState sends payload to given address. INIT, PAUSED, RUNNING, SHUTDOWN.
 func (c CustomClient) PutState(url string, payload string) string {
 
-	req, err := http.NewRequest(http.MethodPut, url, strings.NewReader(payload))
+	req, err := http.NewRequest(http.MethodPut, url+"/"+payload, strings.NewReader(payload))
 	if err != nil {
 		log.Panic(err)
 	}
-
-	//log.Println("req: ", string(req.Body))
+	log.Println("Req: ", req.Body, "Url: ", req.URL) // DEBUG
 
 	resp, err := c.Do(req)
 	if err != nil {

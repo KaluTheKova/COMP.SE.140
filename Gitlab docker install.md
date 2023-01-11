@@ -291,4 +291,11 @@ Vielä time-to-live
 2023-01-11 12:36:09 compse140-rabbitmq-1  | 2023-01-11 10:36:09.442346+00:00 [error] <0.1019.0> missed heartbeats from client, timeout: 10s
 pitää laittaa pidemmäksi, että pause sallitaan.
 
-Tai sitte vedät vaan toisen handlefucin kautta. Kokeile eka.
+Tai sitte vedät vaan toisen handlefucin kautta. Kokeile eka. 
+Ongelma: Sama, channel jää lukkoon eikä vapaudu ikinä.
+
+https://stackoverflow.com/questions/41991926/how-to-detect-dead-rabbitmq-connection
+https://golang.hotexamples.com/examples/github.com.streadway.amqp/Config/Heartbeat/golang-config-heartbeat-method-examples.html
+
+curl localhost:8083/state -X PUT -d "SHUTDOWN"
+curl: (52) Empty reply from server <- Korjaa

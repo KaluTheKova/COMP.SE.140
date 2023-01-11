@@ -80,7 +80,7 @@ func putState(ginContext *gin.Context) {
 	// GET CURRENT STATE. If current state == payload, nothing happens.
 	if payloadString == currentState {
 		ginContext.String(http.StatusOK, fmt.Sprintf("Current state already %v", payloadString))
-		log.Printf("Current state already %v", payloadString)
+		log.Printf("Current state already %v\n", payloadString)
 		return
 	} else if payloadString == "INIT" && currentState != "INIT" { // INIT is special case according to instructions. INIT should set state to RUNNING
 		writeStateToFile(filename, "RUNNING")
@@ -113,7 +113,7 @@ func putState(ginContext *gin.Context) {
 	case "SHUTDOWN":
 		// Shutdown all containers
 		ginContext.String(http.StatusOK, stateShutdown)
-		stopAllContainers(dockerClient, ginContext)
+		stopAllContainers(dockerClient)
 	}
 }
 
@@ -198,7 +198,6 @@ func clearFileOnStartup(filename string) {
 	if err != nil {
 		log.Println(err)
 	}
-
 	log.Printf("Removed file: %v", filename) // DEBUG
 }
 
@@ -209,7 +208,7 @@ func buildTimeStampedState(state string) string {
 	return timeStampedMessage
 }
 
-func stopAllContainers(client *client.Client, ginContext *gin.Context) {
+func stopAllContainers(client *client.Client) {
 	ctx := context.Background()
 
 	containers, err := client.ContainerList(ctx, types.ContainerListOptions{})
@@ -224,13 +223,13 @@ func stopAllContainers(client *client.Client, ginContext *gin.Context) {
 	for _, container := range containers {
 		if strings.Contains(container.Image, "compse140") && !strings.Contains(container.Image, "compse140-gateway") {
 			log.Print("Stopping container ", container.Image, "... ") // DEBUG
-			ginContext.String(http.StatusOK, "Stopping container ", container.Image, "... ")
+			//ginContext.String(http.StatusOK, "Stopping container ", container.Image, "... ")
 			err := client.ContainerStop(ctx, container.ID, options)
 			if err != nil {
 				panic(err)
 			}
 			log.Println("Success") // DEBUG
-			ginContext.String(http.StatusOK, "Success")
+			//ginContext.String(http.StatusOK, "Success")
 		}
 	}
 	containers, err = client.ContainerList(ctx, types.ContainerListOptions{})
@@ -242,13 +241,13 @@ func stopAllContainers(client *client.Client, ginContext *gin.Context) {
 	for _, container := range containers {
 		if strings.Contains(container.Image, "compse140-gateway") {
 			log.Print("Stopping container ", container.Image, "... ") // DEBUG
-			ginContext.String(http.StatusOK, "Stopping container ", container.Image, "... ")
+			//ginContext.String(http.StatusOK, "Stopping container ", container.Image, "... ")
 			err := client.ContainerStop(ctx, container.ID, options)
 			if err != nil {
 				panic(err)
 			}
 			log.Println("Success") // DEBUG
-			ginContext.String(http.StatusOK, "Success")
+			//ginContext.String(http.StatusOK, "Success")
 		}
 	}
 }

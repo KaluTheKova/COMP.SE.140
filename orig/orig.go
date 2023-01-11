@@ -86,12 +86,9 @@ func main() {
 
 func runService() {
 	log.Println("ORIG service running")
-	conn := initializeConnection(rabbitMQAddress)
+	conn, ch, err := initializeConnection(rabbitMQAddress)
+	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
-
-	// create channel
-	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
 	for {
@@ -125,10 +122,13 @@ func sendMessageToRabbit(message string, ch *amqp.Channel) {
 		false,          // no-wait
 		nil,            // arguments
 	)
-	failOnError(err, "Failed to declare an exchange")
+	if err != nil {
+		runService()
+		//resetConnection("Failed to declare an exchange")
+	}
 
 	// cancel when ended
-	ctx, cancel := context.WithTimeout(context.Background(), 9999999*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1800*time.Second)
 	defer cancel()
 
 	// Prefetch qos
@@ -137,7 +137,11 @@ func sendMessageToRabbit(message string, ch *amqp.Channel) {
 		0,     // prefetch size
 		false, // global
 	)
-	failOnError(err, "Failed to set QoS")
+	if err != nil {
+		runService()
+		//resetConnection("Failed to set QoS")
+	}
+	//failOnError(err, "Failed to set QoS")
 
 	// message body
 	body := message
@@ -150,15 +154,45 @@ func sendMessageToRabbit(message string, ch *amqp.Channel) {
 			ContentType: "text/plain",
 			Body:        []byte(body),
 		})
-	failOnError(err, "Failed to publish a message")
+	if err != nil {
+		runService()
+		//resetConnection("Failed to publish a message")
+	}
+	//failOnError(err, "Failed to publish a message")
 	log.Printf(" [x] Sent %s\n", body) // DEBUG
 }
 
-func initializeConnection(rabbitMQAddress string) *amqp.Connection {
-	conn, err := amqp.Dial(rabbitMQAddress)
-	failOnError(err, "Failed to connect to RabbitMQ")
+func initializeConnection(rabbitMQAddress string) (*amqp.Connection, *amqp.Channel, error) {
+	var dialConfig amqp.Config
+	dialConfig.Heartbeat = 10 * time.Second
+
+	//conn, err := amqp.Dial(rabbitMQAddress)
+	conn, err := amqp.DialConfig(rabbitMQAddress, dialConfig)
+	if err != nil {
+		return nil, nil, err
+	}
+	//failOnError(err, "Failed to connect to RabbitMQ")
+
+	// create channel
+	ch, err := conn.Channel()
+	if err != nil {
+		return nil, nil, err
+	}
+	//failOnError(err, "Failed to open a channel")
+
 	//defer conn.Close()
-	return conn
+	return conn, ch, nil
+}
+
+func resetConnection(errMessage string) {
+	log.Println(errMessage, ", resetting connection")
+	conn, ch, err := initializeConnection(rabbitMQAddress)
+	defer conn.Close()
+	defer ch.Close()
+
+	if err != nil {
+		failOnError(err, "Resetting connection failed")
+	}
 }
 
 // Helper to check each ampq call
