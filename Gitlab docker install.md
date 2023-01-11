@@ -159,9 +159,18 @@ https://stackoverflow.com/questions/57182988/gitlab-ci-and-go-modules
 ## CURL COMMANDS
 curl localhost:8083/state -X PUT -d "PAUSED"
 curl localhost:8083/state -X PUT -d "RUNNING"
+curl localhost:8083/state -X PUT -d "SHUTDOWN"
+curl localhost:8083/state -X PUT -d "INIT"
 curl localhost:8080
 curl localhost:8083/messages
 curl -v -X GET localhost:8083/messages
+curl -v GET localhost:8083/state
+curl -v GET localhost:8083/run-log
+
+curl localhost:8083/state
+curl localhost:8083/run-log
+curl localhost:8080
+curl localhost:8083/messages
 
 ## GITLAB RUNNER REGISTER
 gitlab-runner register -n \
@@ -265,3 +274,21 @@ Mitä jos pausettais vain container executionin? :>>>>
 https://docs.docker.com/engine/reference/commandline/pause/
 
 Jos ei onnistu niin tee erilliset handlefuncit origiin
+Toimii.
+
+Sitten get State
+
+JA TEE SHUTDOWN SEKÄ INIT
+                                                     
+#0 2.414 # github.com/KaluTheKova/COMP.SE.140/httpserv                                                                                                                        
+#0 2.414 ./gateway.go:201:23: undefined: container.StopOptions
+#0 2.414 ./gateway.go:235:23: undefined: container.StopOptions
+
+Gatewat
+
+Vielä time-to-live
+2023-01-11 12:36:09 compse140-rabbitmq-1  | 2023-01-11 10:36:09.442346+00:00 [error] <0.1019.0> closing AMQP connection <0.1019.0> (172.22.0.7:52594 -> 172.22.0.2:5672):
+2023-01-11 12:36:09 compse140-rabbitmq-1  | 2023-01-11 10:36:09.442346+00:00 [error] <0.1019.0> missed heartbeats from client, timeout: 10s
+pitää laittaa pidemmäksi, että pause sallitaan.
+
+Tai sitte vedät vaan toisen handlefucin kautta. Kokeile eka.

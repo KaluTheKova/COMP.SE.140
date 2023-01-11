@@ -7,14 +7,21 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
 )
 
+// GLOBALS
+var currentState string = "INIT"
+
+// CONST
 const (
-	filename        string = "messages.txt"
+	filename        string = "state.txt"
 	httpservAddress string = "http://httpserv:8080"
 	origAddress     string = "http://orig:8085"
 )
@@ -22,6 +29,11 @@ const (
 // When requested, returns content of the file created by OBSE
 func main() {
 	log.Printf("API GATEWAY STARTING")
+
+	clearFileOnStartup(filename)
+
+	// Write initial state
+	writeStateToFile(filename, "INIT")
 
 	router := gin.Default()
 	router.GET("/messages", getMessages)
@@ -42,14 +54,6 @@ func getMessages(ginContext *gin.Context) {
 	ginContext.String(http.StatusOK, string(resp))
 }
 
-// PUT /state (payload “INIT”, “PAUSED”, “RUNNING”, “SHUTDOWN”)
-// PAUSED = ORIG service is not sending messages
-// RUNNING = ORIG service sends messages
-// If the new state is equal to previous nothing happens.
-// There are two special cases:
-// INIT = everything (except log information for /run-log and /messages) is in the
-// initial state and ORIG starts sending again, state is set to RUNNING
-// SHUTDOWN = all containers are stopped
 func putState(ginContext *gin.Context) {
 	// Read put payload
 	payload, err := ioutil.ReadAll(ginContext.Request.Body)
@@ -66,96 +70,89 @@ func putState(ginContext *gin.Context) {
 		ginContext.String(http.StatusOK, fmt.Sprintf("PUT %s not valid input", payloadString))
 	}
 
-	// Initialize client
-	customClient := NewCustomClient()
+	// Initialize HTTP client
+	//customClient := NewCustomClient()
 
 	// Docker Client
 	dockerClient := createDockerClient()
 	defer dockerClient.Close()
-	// GET CURRENT STATE. If current state == payload, nothing happens.
-	//state := readState()
 
-	// State caseswitch tänne
+	// GET CURRENT STATE. If current state == payload, nothing happens.
+	if payloadString == currentState {
+		ginContext.String(http.StatusOK, fmt.Sprintf("Current state already %v", payloadString))
+		log.Printf("Current state already %v", payloadString)
+		return
+	} else if payloadString == "INIT" && currentState != "INIT" { // INIT is special case according to instructions. INIT should set state to RUNNING
+		writeStateToFile(filename, "RUNNING")
+		currentState = "RUNNING"
+	} else {
+		writeStateToFile(filename, payloadString)
+		currentState = payloadString
+	}
+
 	// Cases
-	// stateInit := "ORIG service set to initial state"
-	// statePaused := "ORIG service paused"
-	// stateRunning := "ORIG service running"
-	// stateShutdown := "ORIG service shutting down"
+	stateInit := "ORIG service set to initial state\n"
+	statePaused := "ORIG service paused\n"
+	stateRunning := "ORIG service running\n"
+	stateShutdown := "ORIG service shutting down\n"
 
 	switch payloadString {
 	case "INIT":
-		// Clean message log, start origin from 0
-		// Restart all containers from scratch?
-		// https://gist.github.com/frikky/e2efcea6c733ea8d8d015b7fe8a91bf6
-		resp := customClient.PutState(origAddress, string(payload))
-		ginContext.String(http.StatusOK, resp)
+		// Restart container ORIG
+		restartContainers(dockerClient, "compse140-orig-1")
+		//resp := customClient.PutState(origAddress, string(payload))
+		ginContext.String(http.StatusOK, stateInit)
 	case "PAUSED":
 		// Pause ORIG
-		//resp := customClient.PutState(origAddress, string(payload))
 		pauseContainer(dockerClient, "compse140-orig-1")
-		ginContext.String(http.StatusOK, "ORIG paused\n")
+		ginContext.String(http.StatusOK, statePaused)
 	case "RUNNING":
-		// Start ORIG
-		//resp := customClient.PutState(origAddress, string(payload))
+		// Restart ORIG
 		unpauseContainer(dockerClient, "compse140-orig-1")
-		ginContext.String(http.StatusOK, "ORIG running\n")
+		ginContext.String(http.StatusOK, stateRunning)
 	case "SHUTDOWN":
 		// Shutdown all containers
-		// https://gist.github.com/frikky/e2efcea6c733ea8d8d015b7fe8a91bf6
-		listContainers(dockerClient)
-		ginContext.String(http.StatusOK, "Listed containers\n")
+		ginContext.String(http.StatusOK, stateShutdown)
+		stopAllContainers(dockerClient, ginContext)
 	}
 }
 
 // GET /state (as text/plain)
 // get the value of state
-func getState(c *gin.Context) {
-
+func getState(ginContext *gin.Context) {
+	ginContext.String(http.StatusOK, currentState+"\n")
 }
 
 // GET /run-log (as text/plain)
 // Get information about state changes
-func getRunLog(c *gin.Context) {
-
+func getRunLog(ginContext *gin.Context) {
+	fileContents, err := os.ReadFile(filename)
+	if err != nil {
+		log.Println(err)
+	}
+	ginContext.String(http.StatusOK, string(fileContents))
 }
 
-func readState(filename string) string {
-	// file, err := os.OpenFile("state.txt")
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-	return "lol"
-}
-
-func readRunlog(filename string) {
-	// Read runlog
-}
-
-// Write listened messages to file
-func writeStateToFile(filename string, message string) {
+// Write state to file
+func writeStateToFile(filename string, state string) {
 	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		log.Panic(err)
 	}
 	defer file.Close()
 
-	_, err = file.WriteString(message + "\n")
+	timeStampedState := buildTimeStampedState(state)
+
+	_, err = file.WriteString(timeStampedState + "\n")
 	if err != nil {
 		log.Panic(err)
 	}
 
 	// Flush writer
 	file.Sync()
-
-	//log.Printf("WROTE TO FILENAME %v MESSAGE %v\n", filename, message) // DEBUG
 }
 
 func createDockerClient() *client.Client {
-	// client, err := client.NewEnvClient()
-	// if err != nil {
-	// 	fmt.Printf("Unable to create docker client: %s", err)
-	// }
-
 	client, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Panicf("Unable to create docker client: %s", err)
@@ -179,6 +176,80 @@ func unpauseContainer(client *client.Client, containerName string) {
 	err := client.ContainerUnpause(ctx, containerName)
 	if err != nil {
 		log.Panicf("Unable to stop container %s: %s", containerName, err)
+	}
+}
+
+func restartContainers(client *client.Client, containerName string) {
+	ctx := context.Background()
+
+	timeout := 0
+	options := container.StopOptions{Signal: "SIGTERM", Timeout: &timeout}
+	//options := container.StopOptions{"SIGTERM", &timeout}
+
+	err := client.ContainerRestart(ctx, containerName, options)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// Removes filename
+func clearFileOnStartup(filename string) {
+	err := os.Remove(filename)
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Printf("Removed file: %v", filename) // DEBUG
+}
+
+// Builds a message with timestamp and message counter
+func buildTimeStampedState(state string) string {
+	timestamp := time.Now().Format("2006-01-02T15:04:05.999Z")
+	timeStampedMessage := fmt.Sprintf("%v %v ", timestamp, state)
+	return timeStampedMessage
+}
+
+func stopAllContainers(client *client.Client, ginContext *gin.Context) {
+	ctx := context.Background()
+
+	containers, err := client.ContainerList(ctx, types.ContainerListOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	timeout := 0
+	options := container.StopOptions{Timeout: &timeout}
+
+	// Shutdown all containers whose image name contains substring "compse140", but shutdown Gateway only after everything else is stopped.
+	for _, container := range containers {
+		if strings.Contains(container.Image, "compse140") && !strings.Contains(container.Image, "compse140-gateway") {
+			log.Print("Stopping container ", container.Image, "... ") // DEBUG
+			ginContext.String(http.StatusOK, "Stopping container ", container.Image, "... ")
+			err := client.ContainerStop(ctx, container.ID, options)
+			if err != nil {
+				panic(err)
+			}
+			log.Println("Success") // DEBUG
+			ginContext.String(http.StatusOK, "Success")
+		}
+	}
+	containers, err = client.ContainerList(ctx, types.ContainerListOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	// Last, shutdown Gateway
+	for _, container := range containers {
+		if strings.Contains(container.Image, "compse140-gateway") {
+			log.Print("Stopping container ", container.Image, "... ") // DEBUG
+			ginContext.String(http.StatusOK, "Stopping container ", container.Image, "... ")
+			err := client.ContainerStop(ctx, container.ID, options)
+			if err != nil {
+				panic(err)
+			}
+			log.Println("Success") // DEBUG
+			ginContext.String(http.StatusOK, "Success")
+		}
 	}
 }
 

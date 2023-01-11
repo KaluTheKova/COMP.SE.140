@@ -13,8 +13,9 @@ import (
 // GLOBALS
 var rabbitMQAddress string = "amqp://guest:guest@rabbitmq:5672/"
 var routingKey = "compse140.o"
-var conn, connErr = amqp.Dial(rabbitMQAddress)
-var ch, chErr = conn.Channel()
+
+// var conn, connErr = amqp.Dial(rabbitMQAddress)
+// var ch, chErr = conn.Channel()
 var start = make(chan struct{})
 var pause = make(chan struct{})
 var quit = make(chan struct{})
@@ -127,7 +128,7 @@ func sendMessageToRabbit(message string, ch *amqp.Channel) {
 	failOnError(err, "Failed to declare an exchange")
 
 	// cancel when ended
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 9999999*time.Second)
 	defer cancel()
 
 	// Prefetch qos
