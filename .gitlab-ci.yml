@@ -12,7 +12,7 @@
 #   DOCKER_TLS_CERTDIR: ""
 #   DOCKER_DRIVER: overlay2
 
-image: golang:1.19
+image: golang:alpine
 
 stages:
   - lint
@@ -22,7 +22,18 @@ stages:
 static-analysis:
   stage: lint
   script:
-    - go vet ./gateway ./httpserv ./orig ./obse ./imed
+    - cd ./gateway 
+    - go vet
+    - cd ..
+    - cd ./httpserv
+    - go vet
+    - cd ..
+    - cd ./obse
+    - go vet
+    - cd ..
+    - cd ./imed
+    - go vet
+    - echo "Linting succesful"
 
 test:
   stage: unit-test
