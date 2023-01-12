@@ -15,7 +15,14 @@
 image: golang:alpine
 
 stages:
+  - lint
   - unit-test
+  - deploy
+
+static-analysis:
+  stage: lint
+  script:
+    - go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
 
 test:
   stage: unit-test
@@ -36,4 +43,12 @@ test:
     # - go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
     # - go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
     # - go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
+
+deploy-job:
+  stage: deploy 
+  environment: production
+  script:
+    - export DOCKER_HOST=unix:///var/run/docker.sock
+    - docker-compose -H $DOCKER_HOST up --build
+    - echo "Application successfully deployed."
 
