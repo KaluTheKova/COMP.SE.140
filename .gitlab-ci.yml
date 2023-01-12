@@ -12,7 +12,7 @@
 #   DOCKER_TLS_CERTDIR: ""
 #   DOCKER_DRIVER: overlay2
 
-image: golang:alpine
+image: golang:1.19
 
 stages:
   - lint
