@@ -57,7 +57,7 @@ func (c CustomClient) PutState(url string, payload string) string {
 	if err != nil {
 		log.Panic(err)
 	}
-	log.Println("Req: ", req.Body, "Url: ", req.URL) // DEBUG
+	//log.Println("Req: ", req.Body, "Url: ", req.URL) // DEBUG
 
 	resp, err := c.Do(req)
 	if err != nil {

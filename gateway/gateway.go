@@ -260,6 +260,6 @@ func listContainers(client *client.Client) {
 	}
 
 	for _, container := range container {
-		fmt.Println(container.ID, container.Image)
+		log.Println(container.ID, container.Image)
 	}
 }
