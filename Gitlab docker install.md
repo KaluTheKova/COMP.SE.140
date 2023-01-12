@@ -299,3 +299,5 @@ https://golang.hotexamples.com/examples/github.com.streadway.amqp/Config/Heartbe
 
 curl localhost:8083/state -X PUT -d "SHUTDOWN"
 curl: (52) Empty reply from server <- Korjaa
+
+privileged: true in /etc/gitlab-runner/config.toml

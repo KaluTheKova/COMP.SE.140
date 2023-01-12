@@ -63,11 +63,11 @@ deploy-job:
     alias: localhost
   variables:
     DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ""
-    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ''
+    #DOCKER_DRIVER: overlay2
   environment: production
   script:
   #  - export DOCKER_HOST=unix:///var/run/docker.sock
-    - docker-compose -H $DOCKER_HOST up --build
+    - docker-compose -H $DOCKER_HOST up --build -d
     - echo "Application successfully deployed."
 
