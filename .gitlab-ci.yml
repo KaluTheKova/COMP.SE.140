@@ -56,7 +56,15 @@ test:
     # - go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
 
 deploy-job:
-  stage: deploy 
+  stage: deploy
+  image: docker
+  services:
+  - name: docker:dind
+    alias: localhost
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_DRIVER: overlay2
   environment: production
   script:
     - export DOCKER_HOST=unix:///var/run/docker.sock
