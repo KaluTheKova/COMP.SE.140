@@ -44,8 +44,6 @@ services:
     build: ./httpserv
     volumes:
       - message-storage:/app/message-storage # This accidentally overwrote the Dockerfile /app folder
-    ports:
-      - "8080:8080"
     depends_on:
       rabbitmq:
         condition: service_healthy

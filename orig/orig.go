@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"sync"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -13,13 +12,6 @@ import (
 // GLOBALS
 var rabbitMQAddress string = "amqp://guest:guest@rabbitmq:5672/"
 var routingKey = "compse140.o"
-
-// var conn, connErr = amqp.Dial(rabbitMQAddress)
-// var ch, chErr = conn.Channel()
-var start = make(chan struct{})
-var pause = make(chan struct{})
-var quit = make(chan struct{})
-var wg sync.WaitGroup
 var i = 1
 
 // Publishes messages to TOPIC compse140.o
@@ -27,62 +19,7 @@ var i = 1
 func main() {
 	log.Printf("ORIG STARTING") // DEBUG
 	runService()
-	// router := gin.Default()
-	// router.PUT("/", stateHandler)
-	// router.Run(":8085")
 }
-
-// // Act based on PUT request payload
-// func stateHandler(ginContext *gin.Context) {
-// 	runService()
-
-// 	// Read put payload
-// 	payload, err := ioutil.ReadAll(ginContext.Request.Body)
-// 	if err != nil {
-// 		log.Panic(err)
-// 	}
-
-// 	payloadString := string(payload)
-
-// 	log.Printf("ORIG payload: %s", payloadString)
-
-// 	// Cases
-// 	statePaused := "ORIG service paused\n"
-// 	stateRunning := "ORIG service running\n"
-
-// }
-
-// func routine() {
-// 	for {
-// 		select {
-// 		case <-pause:
-// 			log.Println("ORIG service paused")
-// 			// ch.Cancel("", true)
-// 			// conn.Close()
-// 			select {
-// 			case <-play:
-// 				log.Println("ORIG service running")
-// 				runService()
-// 			case <-quit:
-// 				wg.Done()
-// 				return
-// 			}
-// 		case <-quit:
-// 			wg.Done()
-// 			return
-// 		default:
-// 			runService()
-// 		}
-// 	}
-// }
-
-// func pauseService() {
-// 	ch.Cancel()
-// 	log.Println("ORIG service paused") // DEBUG
-// 	conn.Close()
-// 	ch.Close()
-// 	return
-// }
 
 func runService() {
 	log.Println("ORIG service running")
@@ -107,11 +44,6 @@ func createMessages(numOfMessage int) string {
 }
 
 func sendMessageToRabbit(message string, ch *amqp.Channel) {
-	// // create channel
-	// ch, err := conn.Channel()
-	// failOnError(err, "Failed to open a channel")
-	// defer ch.Close()
-
 	// Exchange
 	err := ch.ExchangeDeclare(
 		"mainExchange", // name
@@ -124,7 +56,6 @@ func sendMessageToRabbit(message string, ch *amqp.Channel) {
 	)
 	if err != nil {
 		runService()
-		//resetConnection("Failed to declare an exchange")
 	}
 
 	// cancel when ended
@@ -139,9 +70,7 @@ func sendMessageToRabbit(message string, ch *amqp.Channel) {
 	)
 	if err != nil {
 		runService()
-		//resetConnection("Failed to set QoS")
 	}
-	//failOnError(err, "Failed to set QoS")
 
 	// message body
 	body := message
@@ -156,9 +85,7 @@ func sendMessageToRabbit(message string, ch *amqp.Channel) {
 		})
 	if err != nil {
 		runService()
-		//resetConnection("Failed to publish a message")
 	}
-	//failOnError(err, "Failed to publish a message")
 	log.Printf(" [x] Sent %s\n", body) // DEBUG
 }
 
@@ -166,21 +93,16 @@ func initializeConnection(rabbitMQAddress string) (*amqp.Connection, *amqp.Chann
 	var dialConfig amqp.Config
 	dialConfig.Heartbeat = 10 * time.Second
 
-	//conn, err := amqp.Dial(rabbitMQAddress)
 	conn, err := amqp.DialConfig(rabbitMQAddress, dialConfig)
 	if err != nil {
 		return nil, nil, err
 	}
-	//failOnError(err, "Failed to connect to RabbitMQ")
 
 	// create channel
 	ch, err := conn.Channel()
 	if err != nil {
 		return nil, nil, err
 	}
-	//failOnError(err, "Failed to open a channel")
-
-	//defer conn.Close()
 	return conn, ch, nil
 }
 

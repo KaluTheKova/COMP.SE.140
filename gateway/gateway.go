@@ -70,9 +70,6 @@ func putState(ginContext *gin.Context) {
 		ginContext.String(http.StatusOK, fmt.Sprintf("PUT %s not valid input", payloadString))
 	}
 
-	// Initialize HTTP client
-	//customClient := NewCustomClient()
-
 	// Docker Client
 	dockerClient := createDockerClient()
 	defer dockerClient.Close()
@@ -100,7 +97,6 @@ func putState(ginContext *gin.Context) {
 	case "INIT":
 		// Restart container ORIG
 		restartContainers(dockerClient, "compse140-orig-1")
-		//resp := customClient.PutState(origAddress, string(payload))
 		ginContext.String(http.StatusOK, stateInit)
 	case "PAUSED":
 		// Pause ORIG
@@ -113,8 +109,6 @@ func putState(ginContext *gin.Context) {
 	case "SHUTDOWN":
 		// Shutdown all containers
 		ginContext.String(http.StatusOK, stateShutdown)
-		//log.Println(stateShutdown) // DEBUG
-		//log.Println("Sleep over") // DEBUG
 		stopAllContainers(dockerClient)
 	}
 }
@@ -159,7 +153,6 @@ func createDockerClient() *client.Client {
 	if err != nil {
 		log.Panicf("Unable to create docker client: %s", err)
 	}
-
 	return client
 }
 
@@ -224,13 +217,11 @@ func stopAllContainers(client *client.Client) {
 	for _, container := range containers {
 		if strings.Contains(container.Image, "compse140") && !strings.Contains(container.Image, "compse140-gateway") {
 			log.Print("Stopping container ", container.Image, "... ") // DEBUG
-			//ginContext.String(http.StatusOK, "Stopping container ", container.Image, "... ")
 			err := client.ContainerStop(ctx, container.ID, options)
 			if err != nil {
 				panic(err)
 			}
 			log.Println("Success") // DEBUG
-			//ginContext.String(http.StatusOK, "Success")
 		}
 	}
 	containers, err = client.ContainerList(ctx, types.ContainerListOptions{})
@@ -242,13 +233,11 @@ func stopAllContainers(client *client.Client) {
 	for _, container := range containers {
 		if strings.Contains(container.Image, "compse140-gateway") {
 			log.Print("Stopping container ", container.Image, "... ") // DEBUG
-			//ginContext.String(http.StatusOK, "Stopping container ", container.Image, "... ")
 			err := client.ContainerStop(ctx, container.ID, options)
 			if err != nil {
 				panic(err)
 			}
 			log.Println("Success") // DEBUG
-			//ginContext.String(http.StatusOK, "Success")
 		}
 	}
 }

@@ -1,59 +1,56 @@
 # COMP.SE.140
 
+## Instructions for the teaching assistant
 
+###  Implemented optional features
+- Static analysis check is done using go vet (but it does look horrible since ./... didn't work in container for some reason)
 
-1. Instructions for the teaching assistant
-## Implemented optional features
-- Static analysis check using go vet (but it does look horrible since ./... didn't work in container for some reason)
-
-## Instructions for examiner to test the system.
+### Instructions for examiner to test the system.
 0. Make sure to clean any other compose140 exercises from containers and images first.
 1. Start the system with "docker compose up -d" (or "docker-compose up" if using Docker Compose standlone)
 2. Run commands in any order you wish:
-curl localhost:8083/state -X PUT -d "INIT"
-curl localhost:8083/state -X PUT -d "PAUSED"
-curl localhost:8083/state -X PUT -d "RUNNING"
-curl localhost:8083/state -X PUT -d "SHUTDOWN"
+- curl localhost:8083/state -X PUT -d "INIT"
+- curl localhost:8083/state -X PUT -d "PAUSED"
+- curl localhost:8083/state -X PUT -d "RUNNING"
+- curl localhost:8083/state -X PUT -d "SHUTDOWN"
+- curl localhost:8083/state
+- curl localhost:8083/run-log
+- curl localhost:8083/messages
 
 NOTE: As per exercise instructions, "INIT" is logged into state log as "RUNNING".
 
-curl localhost:8083/state
-curl localhost:8083/run-log
-curl localhost:8083/messages
-
 NOTE: Unit tests are not located in "tests" - folder, because Go requires tests to reside in the same folder as the file that is being tested.
 
-2. Description of the CI/CD pipeline
-Briefly document all steps:
-#### Version management; use of branches etc
+## Description of the CI/CD pipeline
+### Version management; use of branches etc
 - Project pushes to two remotes simulatenously, Github and local Gitlab with CI/CD pipeline.
 - Gitlab repo is locally run in the Docker, using Gitlab CE.
 - Github repo: 
-#### Building tools
+### Building tools
 - Built using go build
 - Image: golang:alpine
-#### Testing; tools and test cases
+### Testing; tools and test cases
 - Testing uses go's testing: go test
 - All the external outputs are tested.
-#### Packing
+### Packing
 - Packaged as containers and run in a dind-container on the gitlab-runner.
-#### Deployment
+### Deployment
 - Deployed using dind-container on the gitlab-runner.
-#### Operating; monitoring
-- Operated using the following curl commands:
-curl localhost:8083/state -X PUT -d "PAUSED"
-curl localhost:8083/state -X PUT -d "RUNNING"
-curl localhost:8083/state -X PUT -d "INIT"
-curl localhost:8083/state -X PUT -d "SHUTDOWN"
-curl localhost:8083/state
-curl localhost:8083/run-log
-curl localhost:8083/messages
-- No monitoring implemented.
+### Operating; monitoring
+Operated using the following curl commands:
+- curl localhost:8083/state -X PUT -d "INIT"
+- curl localhost:8083/state -X PUT -d "PAUSED"
+- curl localhost:8083/state -X PUT -d "RUNNING"
+- curl localhost:8083/state -X PUT -d "SHUTDOWN"
+- curl localhost:8083/state
+- curl localhost:8083/run-log
+- curl localhost:8083/messages
+No monitoring implemented.
 
-
-3. Example runs of the pipeline
+## Example runs of the pipeline
 
 ### Succeeding pipeline:
+```
 Running with gitlab-runner 15.5.1 (7178588d)
   on priviledged-runner k4L6VW4c
 Preparing the "docker" executor
@@ -415,9 +412,11 @@ Container compse140-orig-1  Started
 $ echo "Application successfully deployed."
 Application successfully deployed.
 Job succeeded
-
+```
 -----------------------------
 ### Failing pipeline:
+
+```
 Running with gitlab-runner 15.5.1 (7178588d)
   on priviledged-runner k4L6VW4c
 Preparing the "docker" executor
@@ -475,9 +474,10 @@ go: downloading github.com/gogo/protobuf v1.3.2
 ./gateway.go:173:3: log.Panic call has possible formatting directive %s
 FAIL	github.com/KaluTheKova/COMP.SE.140/httpserv [build failed]
 ERROR: Job failed: exit code 2
-
-4. Reflections
-### Main learnings and worst difficulties:
+```
+----------------------
+## Reflections
+### Main learnings and worst difficulties
 Main learnings include a yearning for Jenkins automation server or any pipeline automation server where I could replay a pipeline and adjust the gitlab-ci.yml without having to always recommit.
 
 I also learned that one can push into multiple repositories simultaneously. Previously, I had never needed this feature, but now it proved to be interesting to implement and use. So here I configured the project so that it pushes simultaneously to my Github and to my locally hosted Gitlab that ran the pipeline.
@@ -492,7 +492,7 @@ Instead of using HTTP request from Gateway to and resepond on that, I wanted to 
 
 Of course, in a real world production application this might cause problems if the CLI library is reliant on Docker, since the production application would have to always run on Docker instead of being portable to another container engine. In a real world application, I probably would have used the HTTP method. In this case however, we can assume that Docker engine is used to run the application.
 
-And naturally, I would have implemented errorhandling and basically everything more robustly.
+And naturally, I would have implemented error handling and basically everything more robustly.
 
 ### Amount effort (hours) used
 Around 50 I believe.

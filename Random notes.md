@@ -1,25 +1,3 @@
-export GITLAB_HOME=/srv/gitlab
-
-$GITLAB_HOME/data	    /var/opt/gitlab	    For storing application data.
-$GITLAB_HOME/logs	    /var/log/gitlab	    For storing logs.
-$GITLAB_HOME/config	    /etc/gitlab	For     storing the GitLab configuration files.
-
-# Using Docker Engine:
-Once you’ve set up the GITLAB_HOME variable, you can run the image:
-
-sudo docker run --detach \
-  --hostname gitlab.example.com \
-  --publish 443:443 --publish 80:80 --publish 22:22 \
-  --name gitlab \
-  --restart always \
-  --volume $GITLAB_HOME/config:/etc/gitlab \
-  --volume $GITLAB_HOME/logs:/var/log/gitlab \
-  --volume $GITLAB_HOME/data:/var/opt/gitlab \
-  --shm-size 256m \
-  gitlab/gitlab-ee:latest
-
-https://docs.gitlab.com/ee/install/docker.html
-
 ## Gitlab runner
 
 Option 1: Use local system volume mounts to start the Runner container
@@ -311,3 +289,5 @@ curl localhost:8083/state -X PUT -d "INIT"
 curl localhost:8083/state
 curl localhost:8083/run-log
 curl localhost:8083/messages
+
+Tarkista toimiiko httpserv ilman portteja

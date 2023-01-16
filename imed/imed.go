@@ -67,14 +67,6 @@ func consumeMessagesFromQueue() {
 	)
 	failOnError(err, "Failed to bind a queue")
 
-	// // Prefect QoS
-	// err = ch.Qos(
-	// 	1,     // prefetch count
-	// 	0,     // prefetch size
-	// 	false, // global
-	// )
-	// failOnError(err, "Failed to set QoS")
-
 	// Consume messages
 	msgs, err := ch.Consume(
 		queue.Name, // queue
@@ -110,7 +102,6 @@ func sendMessageToQueue(message string) {
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
-	// Separate channels for consume and publish
 	// open channel
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")

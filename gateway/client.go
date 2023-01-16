@@ -16,7 +16,6 @@ type CustomClient struct {
 
 // NewCustomClient creates a new client with custom settings.
 func NewCustomClient() *CustomClient {
-	// Skips x509 error
 	customTransport := http.DefaultTransport.(*http.Transport).Clone()
 	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
@@ -57,7 +56,6 @@ func (c CustomClient) PutState(url string, payload string) string {
 	if err != nil {
 		log.Panic(err)
 	}
-	//log.Println("Req: ", req.Body, "Url: ", req.URL) // DEBUG
 
 	resp, err := c.Do(req)
 	if err != nil {
