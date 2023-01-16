@@ -7,15 +7,19 @@
 
 ### Instructions for examiner to test the system.
 0. Make sure to clean any other compose140 exercises from containers and images first.
-1. Start the system with "docker compose up -d" (or "docker-compose up" if using Docker Compose standlone)
-2. Run commands in any order you wish:
-- curl localhost:8083/state -X PUT -d "INIT"
-- curl localhost:8083/state -X PUT -d "PAUSED"
-- curl localhost:8083/state -X PUT -d "RUNNING"
-- curl localhost:8083/state -X PUT -d "SHUTDOWN"
-- curl localhost:8083/state
-- curl localhost:8083/run-log
-- curl localhost:8083/messages
+1. Clone the repo: ```git clone -b project https://github.com/KaluTheKova/COMP.SE.140.git```
+2. Start the system with ```docker compose up -d``` (or ```docker-compose up``` if using Docker Compose standlone)
+3. Run commands in any order you wish:
+
+```
+curl localhost:8083/state -X PUT -d "INIT"
+curl localhost:8083/state -X PUT -d "PAUSED"
+curl localhost:8083/state -X PUT -d "RUNNING"
+curl localhost:8083/state -X PUT -d "SHUTDOWN"
+curl localhost:8083/state
+curl localhost:8083/run-log
+curl localhost:8083/messages
+```
 
 NOTE: As per exercise instructions, "INIT" is logged into state log as "RUNNING".
 
@@ -38,13 +42,15 @@ NOTE: Unit tests are not located in "tests" - folder, because Go requires tests 
 - Deployed using dind-container on the gitlab-runner.
 ### Operating; monitoring
 Operated using the following curl commands:
-- curl localhost:8083/state -X PUT -d "INIT"
-- curl localhost:8083/state -X PUT -d "PAUSED"
-- curl localhost:8083/state -X PUT -d "RUNNING"
-- curl localhost:8083/state -X PUT -d "SHUTDOWN"
-- curl localhost:8083/state
-- curl localhost:8083/run-log
-- curl localhost:8083/messages
+```
+curl localhost:8083/state -X PUT -d "INIT"
+curl localhost:8083/state -X PUT -d "PAUSED"
+curl localhost:8083/state -X PUT -d "RUNNING"
+curl localhost:8083/state -X PUT -d "SHUTDOWN"
+curl localhost:8083/state
+curl localhost:8083/run-log
+curl localhost:8083/messages
+```
 No monitoring implemented.
 
 ## Example runs of the pipeline
