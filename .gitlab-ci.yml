@@ -1,17 +1,3 @@
-# This specific template is located at:
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Go.gitlab-ci.yml
-
-# image: docker
-
-# services:
-#   - name: docker:dind
-#     alias: localhost
-
-# variables:
-#   DOCKER_HOST: tcp://docker:2375
-#   DOCKER_TLS_CERTDIR: ""
-#   DOCKER_DRIVER: overlay2
-
 image: golang:1.19
 
 stages:
@@ -42,18 +28,6 @@ test:
     - sleep 30
     - cd ./gateway
     - CGO_ENABLED=0 go test
-    # - docker-compose -f docker-compose-test.yml up --exit-code-from=gateway --force-recreate # This can be used for E2E
-    # - cd ./httpserv
-    # - go get -d -v
-    # - go run httpserv.go & disown
-    # - cd ..
-    # - cd ./gateway
-    # - go get -d -v
-    # - CGO_ENABLED=0 go test
-  
-    # - go fmt ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
-    # - go vet ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
-    # - go test ./gateway ./httpserv ./orig ./obse ./imed | grep -v /vendor/
 
 deploy-job:
   stage: deploy
@@ -64,10 +38,8 @@ deploy-job:
   variables:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ''
-    #DOCKER_DRIVER: overlay2
   environment: production
   script:
-  #  - export DOCKER_HOST=unix:///var/run/docker.sock
     - docker-compose -H $DOCKER_HOST up --build -d
     - echo "Application successfully deployed."
 

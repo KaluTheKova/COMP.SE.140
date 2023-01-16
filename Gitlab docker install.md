@@ -301,3 +301,13 @@ curl localhost:8083/state -X PUT -d "SHUTDOWN"
 curl: (52) Empty reply from server <- Korjaa
 
 privileged: true in /etc/gitlab-runner/config.toml
+
+Testikomennot:
+curl localhost:8083/state -X PUT -d "PAUSED"
+curl localhost:8083/state -X PUT -d "RUNNING"
+curl localhost:8083/state -X PUT -d "SHUTDOWN"
+curl localhost:8083/state -X PUT -d "INIT"
+
+curl localhost:8083/state
+curl localhost:8083/run-log
+curl localhost:8083/messages

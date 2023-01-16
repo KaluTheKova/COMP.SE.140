@@ -79,7 +79,7 @@ func putState(ginContext *gin.Context) {
 
 	// GET CURRENT STATE. If current state == payload, nothing happens.
 	if payloadString == currentState {
-		ginContext.String(http.StatusOK, fmt.Sprintf("Current state already %v", payloadString))
+		ginContext.String(http.StatusOK, fmt.Sprintf("Current state already %v\n", payloadString))
 		log.Printf("Current state already %v\n", payloadString)
 		return
 	} else if payloadString == "INIT" && currentState != "INIT" { // INIT is special case according to instructions. INIT should set state to RUNNING
@@ -113,6 +113,8 @@ func putState(ginContext *gin.Context) {
 	case "SHUTDOWN":
 		// Shutdown all containers
 		ginContext.String(http.StatusOK, stateShutdown)
+		//log.Println(stateShutdown) // DEBUG
+		//log.Println("Sleep over") // DEBUG
 		stopAllContainers(dockerClient)
 	}
 }
@@ -184,7 +186,6 @@ func restartContainers(client *client.Client, containerName string) {
 
 	timeout := 0
 	options := container.StopOptions{Signal: "SIGTERM", Timeout: &timeout}
-	//options := container.StopOptions{"SIGTERM", &timeout}
 
 	err := client.ContainerRestart(ctx, containerName, options)
 	if err != nil {
@@ -216,7 +217,7 @@ func stopAllContainers(client *client.Client) {
 		panic(err)
 	}
 
-	timeout := 0
+	timeout := 2
 	options := container.StopOptions{Timeout: &timeout}
 
 	// Shutdown all containers whose image name contains substring "compse140", but shutdown Gateway only after everything else is stopped.
